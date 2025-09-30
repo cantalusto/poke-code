@@ -26,12 +26,14 @@ import { Pokemon, PokemonTeam, TeamPokemon, TeamStats } from '@/types/pokemon';
 import { TeamStorageService } from '@/utils/teamStorage';
 import { pokeApiService } from '@/services/pokeapi';
 import { PokemonCard } from './PokemonCard';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TeamBuilderProps {
   className?: string;
 }
 
 export function TeamBuilder({ className }: TeamBuilderProps) {
+  const { t } = useLanguage();
   const [teams, setTeams] = useState<PokemonTeam[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<PokemonTeam | null>(null);
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null);
@@ -134,7 +136,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
       setSearchResults([]);
     } catch (error) {
       console.error('Error adding Pokémon to team:', error);
-      alert(error instanceof Error ? error.message : 'Failed to add Pokémon to team');
+      alert(error instanceof Error ? error.message : t('failed_add_pokemon_team'));
     }
   };
 
@@ -208,7 +210,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
         setSelectedTeam(importedTeam);
       } catch (error) {
         console.error('Error importing team:', error);
-        alert('Failed to import team. Please check the file format.');
+        alert(t('failed_import_team'));
       }
     };
     reader.readAsText(file);
@@ -243,24 +245,18 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Users className="w-6 h-6 text-blue-500" />
-          <h1 className="text-2xl font-bold">Team Builder</h1>
-        </div>
-        
+      <div className="flex items-center justify-between">        
         <div className="flex items-center gap-2">
           <Button onClick={exportTeam} disabled={!selectedTeam} variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
-            Export
+            {t('export')}
           </Button>
           
           <label>
             <Button variant="outline" size="sm" asChild>
               <span>
                 <Upload className="w-4 h-4 mr-2" />
-                Import
+                {t('import')}
               </span>
             </Button>
             <input
@@ -280,14 +276,14 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5" />
-                Teams
+                {t('teams')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Create New Team */}
               <div className="flex gap-2">
                 <Input
-                  placeholder="Team name"
+                  placeholder={t('team_name')}
                   value={newTeamName}
                   onChange={(e) => setNewTeamName(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && createNewTeam()}
@@ -315,7 +311,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                       <div>
                         <h3 className="font-medium">{team.name}</h3>
                         <p className="text-sm text-gray-500">
-                          {team.pokemon.length}/6 Pokémon
+                          {team.pokemon.length}/6 {t('pokemon')}
                         </p>
                       </div>
                       <Button
@@ -341,8 +337,8 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
           {selectedTeam ? (
             <Tabs defaultValue="pokemon" className="space-y-4">
               <TabsList>
-                <TabsTrigger value="pokemon">Pokémon</TabsTrigger>
-                <TabsTrigger value="stats">Stats</TabsTrigger>
+                <TabsTrigger value="pokemon">{t('pokemon')}</TabsTrigger>
+                <TabsTrigger value="stats">{t('stats')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="pokemon" className="space-y-4">
@@ -354,18 +350,18 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                         <DialogTrigger asChild>
                           <Button disabled={selectedTeam.pokemon.length >= 6}>
                             <Plus className="w-4 h-4 mr-2" />
-                            Add Pokémon
+                            {t('add_pokemon')}
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle>Add Pokémon to Team</DialogTitle>
+                            <DialogTitle>{t('add_pokemon_to_team')}</DialogTitle>
                           </DialogHeader>
                           
                           <div className="space-y-4">
                             <div className="flex gap-2">
                               <Input
-                                placeholder="Search Pokémon..."
+                                placeholder={t('search_pokemon')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && searchPokemon()}
@@ -378,7 +374,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                             {isSearching && (
                               <div className="text-center py-8">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                                <p className="mt-2 text-gray-500">Searching...</p>
+                                <p className="mt-2 text-gray-500">{t('searching')}</p>
                               </div>
                             )}
 
@@ -452,30 +448,44 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <BarChart3 className="w-5 h-5" />
-                          Average Stats
+                          {t('average_stats')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        {Object.entries(teamStats.averageStats).map(([statName, value], index) => (
-                          <div key={`team-stat-${statName}-${index}`} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className={getStatColor(statName)}>
-                                {getStatIcon(statName)}
-                              </span>
-                              <span className="capitalize">
-                                {statName.replace(/([A-Z])/g, ' $1').trim()}
-                              </span>
+                        {Object.entries(teamStats.averageStats).map(([statName, value], index) => {
+                          // Map stat names to translation keys
+                          const statTranslationMap: { [key: string]: string } = {
+                            'hp': 'hp',
+                            'attack': 'attack',
+                            'defense': 'defense',
+                            'specialAttack': 'special_attack',
+                            'specialDefense': 'special_defense',
+                            'speed': 'speed'
+                          };
+                          
+                          const translationKey = statTranslationMap[statName] || statName;
+                          
+                          return (
+                            <div key={`team-stat-${statName}-${index}`} className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className={getStatColor(statName)}>
+                                  {getStatIcon(statName)}
+                                </span>
+                                <span className="capitalize">
+                                  {t(translationKey)}
+                                </span>
+                              </div>
+                              <span className="font-mono font-medium">{value}</span>
                             </div>
-                            <span className="font-mono font-medium">{value}</span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </CardContent>
                     </Card>
 
                     {/* Type Distribution */}
                     <Card>
                       <CardHeader>
-                        <CardTitle>Type Distribution</CardTitle>
+                        <CardTitle>{t('type_distribution')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
@@ -483,9 +493,13 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                             <Badge
                               key={`type-dist-${type}-${index}`}
                               variant="secondary"
-                              className={`${pokeApiService.getTypeColor(type)} text-white`}
+                              className="text-white border-0 font-semibold"
+                              style={{
+                                backgroundColor: pokeApiService.getTypeColor(type),
+                                boxShadow: `0 2px 8px ${pokeApiService.getTypeColor(type)}40`
+                              }}
                             >
-                              {type} ({count})
+                              {t(type)} ({count})
                             </Badge>
                           ))}
                         </div>
@@ -495,7 +509,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                     {/* Weaknesses */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-red-600">Team Weaknesses</CardTitle>
+                        <CardTitle className="text-red-600">{t('team_weaknesses')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
@@ -504,13 +518,17 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                               <Badge
                                 key={`weakness-${weakness}-${index}`}
                                 variant="destructive"
-                                className={`${pokeApiService.getTypeColor(weakness)} text-white`}
+                                className="text-white border-0 font-semibold"
+                                style={{
+                                  backgroundColor: pokeApiService.getTypeColor(weakness),
+                                  boxShadow: `0 2px 8px ${pokeApiService.getTypeColor(weakness)}40`
+                                }}
                               >
-                                {weakness}
+                                {t(weakness)}
                               </Badge>
                             ))
                           ) : (
-                            <p className="text-gray-500">No major weaknesses detected</p>
+                            <p className="text-gray-500">{t('no_major_weaknesses')}</p>
                           )}
                         </div>
                       </CardContent>
@@ -519,7 +537,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                     {/* Resistances */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-green-600">Team Resistances</CardTitle>
+                        <CardTitle className="text-green-600">{t('team_resistances')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
@@ -528,13 +546,17 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                               <Badge
                                 key={`resistance-${resistance}-${index}`}
                                 variant="secondary"
-                                className={`${pokeApiService.getTypeColor(resistance)} text-white`}
+                                className="text-white border-0 font-semibold"
+                                style={{
+                                  backgroundColor: pokeApiService.getTypeColor(resistance),
+                                  boxShadow: `0 2px 8px ${pokeApiService.getTypeColor(resistance)}40`
+                                }}
                               >
-                                {resistance}
+                                {t(resistance)}
                               </Badge>
                             ))
                           ) : (
-                            <p className="text-gray-500">No major resistances detected</p>
+                            <p className="text-gray-500">{t('no_major_resistances')}</p>
                           )}
                         </div>
                       </CardContent>
@@ -548,8 +570,8 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
               <CardContent className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Team Selected</h3>
-                  <p className="text-gray-500">Create a new team or select an existing one to get started.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_team_selected')}</h3>
+                  <p className="text-gray-500">{t('create_or_select_team')}</p>
                 </div>
               </CardContent>
             </Card>

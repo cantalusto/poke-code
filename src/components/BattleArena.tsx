@@ -31,12 +31,14 @@ import {
 import { BattleEngine, AI_TRAINERS } from '@/utils/battleEngine';
 import { TeamStorageService } from '@/utils/teamStorage';
 import { pokeApiService } from '@/services/pokeapi';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface BattleArenaProps {
   className?: string;
 }
 
 export function BattleArena({ className }: BattleArenaProps) {
+  const { t } = useLanguage();
   const [battleEngine] = useState(() => new BattleEngine());
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [battleLog, setBattleLog] = useState<BattleLogEntry[]>([]);
@@ -207,20 +209,20 @@ export function BattleArena({ className }: BattleArenaProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Swords className="w-6 h-6 text-red-500" />
-          Battle Setup
+          {t('battle_setup')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Team Selection */}
         <div>
-          <label className="block text-sm font-medium mb-2">Select Your Team</label>
+          <label className="block text-sm font-medium mb-2">{t('select_your_team')}</label>
           <Select value={selectedTeam?.id || ''} onValueChange={(value) => {
             const team = playerTeams.find(t => t.id === value);
             setSelectedTeam(team || null);
           }}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose a team" />
-            </SelectTrigger>
+                <SelectValue placeholder={t('choose_a_team')} />
+              </SelectTrigger>
             <SelectContent>
               {playerTeams.map((team) => (
                 <SelectItem key={team.id} value={team.id}>
@@ -233,7 +235,7 @@ export function BattleArena({ className }: BattleArenaProps) {
 
         {/* Trainer Selection */}
         <div>
-          <label className="block text-sm font-medium mb-2">Select Opponent</label>
+          <label className="block text-sm font-medium mb-2">{t('select_opponent')}</label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {AI_TRAINERS.map((trainer) => (
               <motion.div
@@ -259,7 +261,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                 </div>
                 <p className="text-sm text-gray-600 mb-2">{trainer.description}</p>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-500">Team:</span>
+                  <span className="text-xs text-gray-500">{t('team')}:</span>
                   {trainer.team.slice(0, 3).map((pokemon, index) => (
                     <Badge key={`${trainer.id}-${pokemon.name}-${index}`} variant="outline" className="text-xs">
                       {pokemon.name}
@@ -282,12 +284,12 @@ export function BattleArena({ className }: BattleArenaProps) {
           size="lg"
         >
           <Play className="w-5 h-5 mr-2" />
-          Start Battle
+          {t('start_battle')}
         </Button>
 
         {(!selectedTeam || selectedTeam.pokemon.length === 0) && (
           <p className="text-sm text-red-500 text-center">
-            Please create a team with at least one Pokémon in the Team Builder first.
+            {t('create_team_first')}
           </p>
         )}
       </CardContent>
@@ -300,7 +302,7 @@ export function BattleArena({ className }: BattleArenaProps) {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading battle...</p>
+            <p className="text-gray-600">{t('loading_battle')}</p>
           </div>
         </div>
       );
@@ -315,7 +317,7 @@ export function BattleArena({ className }: BattleArenaProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold">Battle Arena</h1>
-            <Badge variant="outline">Turn {battleState.turn}</Badge>
+            <Badge variant="outline">{t('turn')} {battleState.turn}</Badge>
           </div>
           
           <div className="flex items-center gap-2">
@@ -328,7 +330,7 @@ export function BattleArena({ className }: BattleArenaProps) {
             </Button>
             <Button variant="outline" size="sm" onClick={resetBattle}>
               <RotateCcw className="w-4 h-4 mr-2" />
-              Reset
+              {t('reset')}
             </Button>
           </div>
         </div>
@@ -350,13 +352,13 @@ export function BattleArena({ className }: BattleArenaProps) {
                           </div>
                           <div className="flex gap-1">
                             {opponentPokemon.pokemon.types.map((type) => (
-                              <Badge
-                                key={`opponent-${type.type.name}`}
-                                className={`${getMoveTypeColor(type.type.name)} text-white text-xs`}
-                              >
-                                {type.type.name}
-                              </Badge>
-                            ))}
+                  <Badge
+                    key={`opponent-${type.type.name}`}
+                    className={`${getMoveTypeColor(type.type.name)} text-white text-xs`}
+                  >
+                    {t(type.type.name)}
+                  </Badge>
+                ))}
                           </div>
                         </div>
                         <div className="w-48">
@@ -414,13 +416,13 @@ export function BattleArena({ className }: BattleArenaProps) {
                         <div className="flex items-center gap-2">
                           <div className="flex gap-1">
                             {playerPokemon.pokemon.types.map((type) => (
-                              <Badge
-                                key={`player-${type.type.name}`}
-                                className={`${getMoveTypeColor(type.type.name)} text-white text-xs`}
-                              >
-                                {type.type.name}
-                              </Badge>
-                            ))}
+                  <Badge
+                    key={`player-${type.type.name}`}
+                    className={`${getMoveTypeColor(type.type.name)} text-white text-xs`}
+                  >
+                    {t(type.type.name)}
+                  </Badge>
+                ))}
                           </div>
                           <div>
                             <h3 className="font-medium">{playerPokemon.nickname}</h3>
@@ -448,7 +450,7 @@ export function BattleArena({ className }: BattleArenaProps) {
             {battleState.phase === 'battle' && !battleState.winner && (
               <Card className="mt-4">
                 <CardHeader>
-                  <CardTitle className="text-lg">Choose Your Action</CardTitle>
+                  <CardTitle className="text-lg">{t('choose_your_action')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
@@ -469,8 +471,8 @@ export function BattleArena({ className }: BattleArenaProps) {
                             </Badge>
                           </div>
                           <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span>Power: {move.power || '—'}</span>
-                            <span>PP: {move.pp}/{move.maxPp}</span>
+                            <span>{t('power')}: {move.power || '—'}</span>
+                            <span>{t('pp')}: {move.pp}/{move.maxPp}</span>
                           </div>
                         </div>
                       </Button>
@@ -483,13 +485,13 @@ export function BattleArena({ className }: BattleArenaProps) {
                           <Button variant="secondary" className="h-auto p-4" disabled={isAnimating}>
                             <div className="w-full text-center">
                               <RotateCcw className="w-5 h-5 mx-auto mb-1" />
-                              <span>Switch Pokémon</span>
+                              <span>{t('switch_pokemon')}</span>
                             </div>
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Choose Pokémon to Switch</DialogTitle>
+                            <DialogTitle>{t('choose_pokemon_to_switch')}</DialogTitle>
                           </DialogHeader>
                           <div className="grid grid-cols-2 gap-4">
                             {battleState.playerTeam
@@ -505,7 +507,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                                   <div className="text-center">
                                     <div className="font-medium">{pokemon.nickname}</div>
                                     <div className="text-sm text-gray-500">
-                                      HP: {pokemon.currentHp}/{pokemon.maxHp}
+                                      {t('hp')}: {pokemon.currentHp}/{pokemon.maxHp}
                                     </div>
                                   </div>
                                 </Button>
@@ -536,16 +538,16 @@ export function BattleArena({ className }: BattleArenaProps) {
                       )}
                     </div>
                     <h2 className="text-2xl font-bold mb-2">
-                      {battleState.winner === 'player' ? 'Victory!' : 'Defeat!'}
+                      {battleState.winner === 'player' ? t('victory') : t('defeat')}
                     </h2>
                     <p className="text-gray-600 mb-4">
                       {battleState.winner === 'player' 
-                        ? 'Congratulations! You won the battle!' 
-                        : 'Better luck next time!'}
+                        ? t('congratulations_won')
+                        : t('better_luck_next_time')}
                     </p>
                     <Button onClick={resetBattle}>
                       <RotateCcw className="w-4 h-4 mr-2" />
-                      Battle Again
+                      {t('battle_again')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -557,7 +559,7 @@ export function BattleArena({ className }: BattleArenaProps) {
           <div className="lg:col-span-1">
             <Card className="h-96">
               <CardHeader>
-                <CardTitle className="text-lg">Battle Log</CardTitle>
+                <CardTitle className="text-lg">{t('battle_log')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div

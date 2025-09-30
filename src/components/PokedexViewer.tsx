@@ -12,9 +12,9 @@ import { Pokemon, PokemonTeam, TeamPokemon } from '@/types/pokemon';
 import { pokeApiService } from '@/services/pokeapi';
 import { TeamStorageService } from '@/utils/teamStorage';
 import { Search, Filter, Grid, List, Shuffle, Loader2, Users, Plus } from 'lucide-react';
+import { useLanguage, GENERATIONS } from '@/contexts/LanguageContext';
 
 interface PokedexViewerProps {
-  onAddToTeam?: (pokemon: Pokemon) => void;
   onViewDetails?: (pokemon: Pokemon) => void;
 }
 
@@ -24,22 +24,10 @@ const POKEMON_TYPES = [
   'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'
 ];
 
-const GENERATIONS = [
-  { value: 'generation-i', label: 'Gen I (Kanto)' },
-  { value: 'generation-ii', label: 'Gen II (Johto)' },
-  { value: 'generation-iii', label: 'Gen III (Hoenn)' },
-  { value: 'generation-iv', label: 'Gen IV (Sinnoh)' },
-  { value: 'generation-v', label: 'Gen V (Unova)' },
-  { value: 'generation-vi', label: 'Gen VI (Kalos)' },
-  { value: 'generation-vii', label: 'Gen VII (Alola)' },
-  { value: 'generation-viii', label: 'Gen VIII (Galar)' },
-  { value: 'generation-ix', label: 'Gen IX (Paldea)' }
-];
-
 export const PokedexViewer: React.FC<PokedexViewerProps> = ({
-  onAddToTeam,
   onViewDetails
 }) => {
+  const { t } = useLanguage();
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,7 +42,6 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
   // Team management states
   const [teams, setTeams] = useState<PokemonTeam[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<PokemonTeam | null>(null);
-  const [showTeamSelector, setShowTeamSelector] = useState(false);
   
   const itemsPerPage = 20;
 
@@ -82,12 +69,12 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
     if (loadedTeams.length > 0 && !selectedTeam) {
       setSelectedTeam(loadedTeams[0]);
     }
-  }, []);
+  }, [selectedTeam]);
 
   // Function to add Pokemon to selected team
   const addPokemonToTeam = async (pokemon: Pokemon) => {
     if (!selectedTeam) {
-      alert('Por favor, selecione um time primeiro!');
+      alert(t('select_team_first'));
       return;
     }
     
@@ -120,10 +107,10 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
       const updatedTeams = TeamStorageService.getTeams();
       setTeams(updatedTeams);
       
-      alert(`${pokemon.name} foi adicionado ao time ${selectedTeam.name}!`);
+      alert(`${pokemon.name} ${t('pokemon_added_to_team')} ${selectedTeam.name}!`);
     } catch (error) {
       console.error('Error adding Pokémon to team:', error);
-      alert(error instanceof Error ? error.message : 'Falha ao adicionar Pokémon ao time');
+      alert(error instanceof Error ? error.message : t('failed_add_pokemon'));
     }
   };
 
@@ -154,7 +141,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
 
   // Function to create a new team
   const createNewTeam = () => {
-    const teamName = prompt('Digite o nome do novo time:');
+    const teamName = prompt(t('enter_team_name'));
     if (teamName && teamName.trim()) {
       const newTeam = TeamStorageService.createTeam(teamName.trim());
       TeamStorageService.saveTeam(newTeam);
@@ -280,7 +267,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading Pokédex...</p>
+          <p className="text-muted-foreground">{t('loading_pokedex')}</p>
         </div>
       </div>
     );
@@ -291,10 +278,10 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Pokédex
+          {t('pokedex')}
         </h1>
         <p className="text-muted-foreground">
-          Discover and explore the world of Pokémon
+          {t('discover_pokemon')}
         </p>
       </div>
 
@@ -306,7 +293,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search Pokémon by name or ID..."
+                  placeholder={t('search_pokemon_placeholder')}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -328,7 +315,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
               >
                 <SelectTrigger className="w-[200px]">
                   <Users className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Selecionar Time" />
+                  <SelectValue placeholder={t('select_team')} />
                 </SelectTrigger>
                 <SelectContent>
                   {teams.map((team) => (
@@ -343,7 +330,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={createNewTeam}
-                title="Criar Novo Time"
+                title={t('create_new_team')}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -354,7 +341,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <Filter className="h-4 w-4 mr-2" />
-                Filters
+                {t('filters')}
               </Button>
               
               <Button
@@ -371,7 +358,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
                 onClick={handleRandomPokemon}
               >
                 <Shuffle className="h-4 w-4 mr-2" />
-                Random
+                {t('random')}
               </Button>
             </div>
           </div>
@@ -388,7 +375,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
               <CardContent className="border-t space-y-4">
                 {/* Type Filters */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Types</label>
+                  <label className="text-sm font-medium">{t('types')}</label>
                   <div className="flex flex-wrap gap-2">
                     {POKEMON_TYPES.map((type, index) => (
                       <Badge
@@ -412,16 +399,16 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
                 {/* Generation Filter */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Generation</label>
+                    <label className="text-sm font-medium">{t('generation')}</label>
                     <Select value={selectedGeneration} onValueChange={setSelectedGeneration}>
                       <SelectTrigger>
-                        <SelectValue placeholder="All generations" />
+                        <SelectValue placeholder={t('all_generations')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All generations</SelectItem>
+                        <SelectItem value="all">{t('all_generations')}</SelectItem>
                         {GENERATIONS.map((gen) => (
                           <SelectItem key={gen.value} value={gen.value}>
-                            {gen.label}
+                            {t(gen.label)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -429,31 +416,31 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Sort by</label>
+                    <label className="text-sm font-medium">{t('sort_by')}</label>
                     <Select value={sortBy} onValueChange={(value: 'id' | 'name' | 'hp' | 'attack' | 'defense' | 'speed') => setSortBy(value)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="id">ID</SelectItem>
-                        <SelectItem value="name">Name</SelectItem>
-                        <SelectItem value="hp">HP</SelectItem>
-                        <SelectItem value="attack">Attack</SelectItem>
-                        <SelectItem value="defense">Defense</SelectItem>
-                        <SelectItem value="speed">Speed</SelectItem>
+                        <SelectItem value="id">{t('id')}</SelectItem>
+                        <SelectItem value="name">{t('name')}</SelectItem>
+                        <SelectItem value="hp">{t('hp')}</SelectItem>
+                        <SelectItem value="attack">{t('attack')}</SelectItem>
+                        <SelectItem value="defense">{t('defense')}</SelectItem>
+                        <SelectItem value="speed">{t('speed')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Order</label>
+                    <label className="text-sm font-medium">{t('order')}</label>
                     <Select value={sortOrder} onValueChange={(value: 'asc' | 'desc') => setSortOrder(value)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="asc">Ascending</SelectItem>
-                        <SelectItem value="desc">Descending</SelectItem>
+                        <SelectItem value="asc">{t('ascending')}</SelectItem>
+                        <SelectItem value="desc">{t('descending')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -461,10 +448,10 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
 
                 <div className="flex justify-between items-center pt-2">
                   <p className="text-sm text-muted-foreground">
-                    {filteredPokemon.length} Pokémon found
+                    {filteredPokemon.length} {t('pokemon_found')}
                   </p>
                   <Button variant="ghost" size="sm" onClick={clearFilters}>
-                    Clear filters
+                    {t('clear_filters')}
                   </Button>
                 </div>
               </CardContent>
@@ -513,7 +500,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
           >
-            Previous
+            {t('previous')}
           </Button>
           
           <div className="flex space-x-1">
@@ -538,7 +525,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
           >
-            Next
+            {t('next')}
           </Button>
         </div>
       )}

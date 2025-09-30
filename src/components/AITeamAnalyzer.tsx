@@ -20,6 +20,8 @@ import {
 import { PokemonTeam } from '@/types/pokemon';
 import { TeamStorageService } from '@/utils/teamStorage';
 import { geminiService } from '@/services/gemini';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { pokeApiService } from '@/services/pokeapi';
 
 interface AITeamAnalyzerProps {
   className?: string;
@@ -46,6 +48,7 @@ interface AnalysisResult {
 }
 
 export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
+  const { t } = useLanguage();
   const [teams, setTeams] = useState<PokemonTeam[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<PokemonTeam | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -63,7 +66,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
 
   const analyzeTeam = async () => {
     if (!selectedTeam || selectedTeam.pokemon.length === 0) {
-      setError('Please select a team with at least one Pokémon');
+      setError(t('select_team_with_pokemon'));
       return;
     }
 
@@ -76,10 +79,10 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
       setAnalysis(result);
     } catch (err) {
       console.error('Analysis error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze team';
+      const errorMessage = err instanceof Error ? err.message : t('failed_to_analyze_team');
       
       if (errorMessage.includes('not available') || errorMessage.includes('API key')) {
-        setError('AI analysis is currently unavailable. Please check your API key configuration in the .env file.');
+        setError(t('ai_analysis_unavailable'));
       } else {
         setError(errorMessage);
       }
@@ -104,19 +107,12 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <Brain className="w-6 h-6 text-purple-500" />
-        <h1 className="text-2xl font-bold">AI Team Analyzer</h1>
-        <Sparkles className="w-5 h-5 text-yellow-500" />
-      </div>
-
       {/* Team Selection */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
-            Select Team to Analyze
+            {t('select_team_to_analyze')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -128,7 +124,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                 setAnalysis(null); // Clear previous analysis
               }}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a team to analyze" />
+                  <SelectValue placeholder={t('choose_team_to_analyze')} />
                 </SelectTrigger>
                 <SelectContent>
                   {teams.map((team) => (
@@ -147,12 +143,12 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Analyzing...
+                  {t('analyzing')}
                 </>
               ) : (
                 <>
                   <Brain className="w-4 h-4 mr-2" />
-                  Analyze Team
+                  {t('analyze_team')}
                 </>
               )}
             </Button>
@@ -168,14 +164,18 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                     <span className="font-medium">{tp.pokemon.name}</span>
                     <div className="flex gap-1">
                       {tp.pokemon.types.map((type, typeIndex) => (
-                        <Badge
-                          key={`team-${tp.pokemon.id}-${type.type.name}-${typeIndex}`}
-                          variant="secondary"
-                          className="text-xs"
-                        >
-                          {type.type.name}
-                        </Badge>
-                      ))}
+                      <Badge
+                        key={`team-${tp.pokemon.id}-${type.type.name}-${typeIndex}`}
+                        variant="secondary"
+                        className="text-xs text-white"
+                        style={{
+                          backgroundColor: pokeApiService.getTypeColor(type.type.name),
+                          boxShadow: `0 2px 8px ${pokeApiService.getTypeColor(type.type.name)}40`
+                        }}
+                      >
+                        {t(type.type.name)}
+                      </Badge>
+                    ))}
                     </div>
                   </div>
                 ))}
@@ -185,7 +185,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
 
           {!selectedTeam && teams.length === 0 && (
             <p className="text-center text-gray-500 py-4">
-              No teams available. Create a team in the Team Builder first.
+              {t('no_teams_available')}
             </p>
           )}
         </CardContent>
@@ -201,7 +201,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
             <CardContent className="pt-6">
               <div className="flex items-center gap-2 text-red-600">
                 <AlertTriangle className="w-5 h-5" />
-                <span className="font-medium">Analysis Failed</span>
+                <span className="font-medium">{t('analysis_failed')}</span>
               </div>
               <p className="text-red-700 mt-2">{error}</p>
               <Button
@@ -211,7 +211,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                 onClick={analyzeTeam}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Try Again
+                {t('try_again')}
               </Button>
             </CardContent>
           </Card>
@@ -234,7 +234,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                     👨‍🔬
                   </div>
-                  Professor Oak&apos;s Analysis
+                  {t('professor_oak_analysis')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -251,7 +251,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                       </span>
                     </div>
                     <Badge variant={getRatingBadgeVariant(analysis.overallRating)}>
-                      Overall Rating
+                      {t('overall_rating')}
                     </Badge>
                   </div>
                 </div>
@@ -264,7 +264,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-green-600">
                     <CheckCircle className="w-5 h-5" />
-                    Team Strengths
+                    {t('team_strengths')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -290,7 +290,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-red-600">
                     <AlertTriangle className="w-5 h-5" />
-                    Areas for Improvement
+                    {t('areas_for_improvement')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -316,12 +316,12 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="w-5 h-5" />
-                    Team Roles
+                    {t('team_roles')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-green-600 mb-2">Current Roles</h4>
+                    <h4 className="font-medium text-green-600 mb-2">{t('current_roles')}</h4>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(analysis.roleAnalysis.roles).map(([role, pokemon], index) => (
                         <Badge key={`role-${role}-${index}`} variant="secondary" className="bg-green-100 text-green-800">
@@ -333,7 +333,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                   
                   {analysis.roleAnalysis.missingRoles.length > 0 && (
                     <div>
-                      <h4 className="font-medium text-orange-600 mb-2">Missing Roles</h4>
+                      <h4 className="font-medium text-orange-600 mb-2">{t('missing_roles')}</h4>
                       <div className="flex flex-wrap gap-2">
                         {analysis.roleAnalysis.missingRoles.map((role, index) => (
                           <Badge key={`missing-role-${role}-${index}`} variant="outline" className="border-orange-300 text-orange-700">
@@ -351,16 +351,24 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Shield className="w-5 h-5" />
-                    Type Coverage
+                    {t('type_coverage')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-blue-600 mb-2">Good Coverage</h4>
+                    <h4 className="font-medium text-blue-600 mb-2">{t('good_coverage')}</h4>
                     <div className="flex flex-wrap gap-2">
                       {analysis.typeBalance.coverage.map((type, index) => (
-                        <Badge key={`coverage-${type}-${index}`} variant="secondary" className="bg-blue-100 text-blue-800">
-                          {type}
+                        <Badge 
+                          key={`coverage-${type}-${index}`} 
+                          variant="secondary" 
+                          className="text-white"
+                          style={{
+                            backgroundColor: pokeApiService.getTypeColor(type),
+                            boxShadow: `0 2px 8px ${pokeApiService.getTypeColor(type)}40`
+                          }}
+                        >
+                          {t(type)}
                         </Badge>
                       ))}
                     </div>
@@ -368,11 +376,20 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                   
                   {analysis.typeBalance.gaps.length > 0 && (
                     <div>
-                      <h4 className="font-medium text-red-600 mb-2">Coverage Gaps</h4>
+                      <h4 className="font-medium text-red-600 mb-2">{t('coverage_gaps')}</h4>
                       <div className="flex flex-wrap gap-2">
                         {analysis.typeBalance.gaps.map((type, index) => (
-                          <Badge key={`gap-${type}-${index}`} variant="outline" className="border-red-300 text-red-700">
-                            {type}
+                          <Badge 
+                            key={`gap-${type}-${index}`} 
+                            variant="outline" 
+                            className="text-white border-2"
+                            style={{
+                              backgroundColor: pokeApiService.getTypeColor(type),
+                              borderColor: pokeApiService.getTypeColor(type),
+                              boxShadow: `0 2px 8px ${pokeApiService.getTypeColor(type)}40`
+                            }}
+                          >
+                            {t(type)}
                           </Badge>
                         ))}
                       </div>
@@ -387,7 +404,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-blue-600">
                   <Lightbulb className="w-5 h-5" />
-                  Improvement Suggestions
+                  {t('improvement_suggestions')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -403,7 +420,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                       <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
                         <span className="text-sm font-medium text-blue-900">
-                          Suggestion {index + 1}:
+                          {t('suggestion')} {index + 1}:
                         </span>
                         <p className="text-sm text-blue-800 mt-1">{suggestion}</p>
                       </div>

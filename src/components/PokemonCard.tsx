@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Pokemon } from '@/types/pokemon';
 import { pokeApiService } from '@/services/pokeapi';
 import { Plus, Info, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PokemonCardProps {
   pokemon: Pokemon;
@@ -26,6 +27,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   showShiny = false,
   className = ''
 }) => {
+  const { t } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showShinyVariant, setShowShinyVariant] = useState(showShiny);
@@ -104,14 +106,12 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
               {pokemon.types.map((type, index) => (
                 <Badge
                   key={`card-${pokemon.id}-${type.type.name}-${index}`}
-                  variant="secondary"
-                  className="text-xs font-medium"
+                  className="text-xs text-white border-0"
                   style={{
                     backgroundColor: pokeApiService.getTypeColor(type.type.name),
-                    color: 'white'
                   }}
                 >
-                  {type.type.name}
+                  {t(type.type.name)}
                 </Badge>
               ))}
             </div>
@@ -153,8 +153,8 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
           {/* Stats Preview */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Stats</span>
-              <span>Total: {totalStats}</span>
+              <span>{t('stats')}</span>
+              <span>{t('total')}: {totalStats}</span>
             </div>
             
             <div className="grid grid-cols-2 gap-2 text-xs">
@@ -181,7 +181,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
 
           {/* Abilities */}
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Abilities</p>
+            <p className="text-xs text-muted-foreground">{t('abilities')}</p>
             <div className="flex flex-wrap gap-1">
               {pokemon.abilities.slice(0, 2).map((ability, index) => (
                 <Badge
@@ -209,7 +209,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
                 style={{ backgroundColor: typeColor }}
               >
                 <Plus size={14} className="mr-1" />
-                Add to Team
+                {t('add_to_team')}
               </Button>
             )}
             

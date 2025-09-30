@@ -10,16 +10,20 @@ import {
   Brain, 
   Swords, 
   Sparkles,
-  Zap,
-  Shield
+  Heart,
+  Shield,
+  Zap
 } from 'lucide-react';
 import { PokedexViewer } from '@/components/PokedexViewer';
 import { TeamBuilder } from '@/components/TeamBuilder';
 import { AITeamAnalyzer } from '@/components/AITeamAnalyzer';
 import { BattleArena } from '@/components/BattleArena';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('pokedex');
+  const { t } = useLanguage();
 
   const tabVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -43,21 +47,22 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  PokéDex Pro
+                  {t('pokemon_goat')}
                 </h1>
-                <p className="text-sm text-gray-500">Modern Pokémon Management</p>
+                <p className="text-sm text-gray-500">{t('tagline')}</p>
               </div>
             </motion.div>
 
             <motion.div 
-              className="flex items-center gap-2"
+              className="flex items-center gap-4"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
             >
               <div className="flex items-center gap-1 text-sm text-gray-500">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                <span>Powered by AI</span>
+                <Heart className="w-4 h-4 text-red-500" />
+                {t('made_with_love')}
               </div>
+              <LanguageToggle />
             </motion.div>
           </div>
         </div>
@@ -75,19 +80,19 @@ export default function Home() {
             <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4 bg-white/80 backdrop-blur-sm">
               <TabsTrigger value="pokedex" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
-                <span className="hidden sm:inline">Pokédex</span>
+                {t('pokedex')}
               </TabsTrigger>
               <TabsTrigger value="team-builder" className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
-                <span className="hidden sm:inline">Team Builder</span>
+                {t('team_builder')}
               </TabsTrigger>
               <TabsTrigger value="ai-analyzer" className="flex items-center gap-2">
                 <Brain className="w-4 h-4" />
-                <span className="hidden sm:inline">AI Analyzer</span>
+                {t('ai_analyzer')}
               </TabsTrigger>
               <TabsTrigger value="battle" className="flex items-center gap-2">
                 <Swords className="w-4 h-4" />
-                <span className="hidden sm:inline">Battle</span>
+                {t('battle_arena')}
               </TabsTrigger>
             </TabsList>
           </motion.div>
@@ -106,10 +111,10 @@ export default function Home() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Search className="w-6 h-6 text-blue-500" />
-                    <h2 className="text-2xl font-bold">Pokédex Explorer</h2>
+                    <h2 className="text-xl font-semibold">{t('pokedex_explorer')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Shield className="w-4 h-4" />
-                      <span>Discover & Explore</span>
+                      {t('discover_and_explore')}
                     </div>
                   </div>
                   <PokedexViewer />
@@ -131,10 +136,10 @@ export default function Home() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Users className="w-6 h-6 text-green-500" />
-                    <h2 className="text-2xl font-bold">Team Builder</h2>
+                    <h2 className="text-xl font-semibold">{t('team_builder')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Shield className="w-4 h-4" />
-                      <span>Build & Manage</span>
+                      {t('build_your_team')}
                     </div>
                   </div>
                   <TeamBuilder />
@@ -156,10 +161,10 @@ export default function Home() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Brain className="w-6 h-6 text-purple-500" />
-                    <h2 className="text-2xl font-bold">AI Team Analyzer</h2>
+                    <h2 className="text-xl font-semibold">{t('ai_analyzer')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Sparkles className="w-4 h-4 text-yellow-500" />
-                      <span>AI Powered</span>
+                      {t('analyze_with_ai')}
                     </div>
                   </div>
                   <AITeamAnalyzer />
@@ -181,10 +186,10 @@ export default function Home() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Swords className="w-6 h-6 text-red-500" />
-                    <h2 className="text-2xl font-bold">Battle Arena</h2>
+                    <h2 className="text-xl font-semibold">{t('battle_arena')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Zap className="w-4 h-4 text-yellow-500" />
-                      <span>Battle & Compete</span>
+                      {t('battle_with_team')}
                     </div>
                   </div>
                   <BattleArena />
@@ -204,32 +209,28 @@ export default function Home() {
           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Search className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-semibold">Explore</h3>
-              <p className="text-sm opacity-90">Discover all Pokémon</p>
+              <p className="text-lg font-bold opacity-100 animate-pulse">{t('discover_pokemon')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Users className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-semibold">Build</h3>
-              <p className="text-sm opacity-90">Create dream teams</p>
+              <p className="text-lg font-bold opacity-100 animate-pulse">{t('build_your_team')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Brain className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-semibold">Analyze</h3>
-              <p className="text-sm opacity-90">AI-powered insights</p>
+              <p className="text-lg font-bold opacity-100 animate-pulse">{t('analyze_with_ai')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Swords className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-semibold">Battle</h3>
-              <p className="text-sm opacity-90">Test your teams</p>
+              <p className="text-lg font-bold opacity-100 animate-pulse">{t('battle_with_team')}</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -240,18 +241,14 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-purple-500" />
-              <span className="font-semibold text-gray-700">PokéDex Pro</span>
+              <Sparkles className="w-5 h-5 text-blue-500" />
+              Poke-Code
             </div>
             <p className="text-sm text-gray-500 mb-4">
-              A modern Pokémon management application powered by AI
+              {t('app_description')}
             </p>
             <div className="flex items-center justify-center gap-6 text-xs text-gray-400">
-              <span>Built with Next.js & TypeScript</span>
-              <span>•</span>
-              <span>Powered by PokéAPI</span>
-              <span>•</span>
-              <span>AI by Google Gemini</span>
+              {t('built_with')} • {t('powered_by_pokeapi')} • {t('ai_by_gemini')}
             </div>
           </div>
         </div>
