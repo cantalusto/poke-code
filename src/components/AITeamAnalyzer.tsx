@@ -1,0 +1,420 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  Brain, 
+  Sparkles, 
+  AlertTriangle, 
+  CheckCircle, 
+  Lightbulb, 
+  Users,
+  Shield,
+  Loader2,
+  RefreshCw
+} from 'lucide-react';
+import { PokemonTeam } from '@/types/pokemon';
+import { TeamStorageService } from '@/utils/teamStorage';
+import { geminiService } from '@/services/gemini';
+
+interface AITeamAnalyzerProps {
+  className?: string;
+}
+
+interface AnalysisResult {
+  overallRating: number;
+  strengths: string[];
+  weaknesses: string[];
+  suggestions: string[];
+  roleAnalysis: {
+    roles: Record<string, string[]>; // role -> pokemon names
+    missingRoles: string[];
+  };
+  typeBalance: {
+    coverage: string[];
+    gaps: string[];
+    redundancies: string[];
+  };
+  synergy: {
+    score: number;
+    explanation: string;
+  };
+}
+
+export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
+  const [teams, setTeams] = useState<PokemonTeam[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<PokemonTeam | null>(null);
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load teams on component mount
+  useEffect(() => {
+    const loadedTeams = TeamStorageService.getTeams().filter(team => team.pokemon.length > 0);
+    setTeams(loadedTeams);
+    if (loadedTeams.length > 0 && !selectedTeam) {
+      setSelectedTeam(loadedTeams[0]);
+    }
+  }, [selectedTeam]);
+
+  const analyzeTeam = async () => {
+    if (!selectedTeam || selectedTeam.pokemon.length === 0) {
+      setError('Please select a team with at least one Pokémon');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setError(null);
+    setAnalysis(null);
+
+    try {
+      const result = await geminiService.analyzeTeam(selectedTeam);
+      setAnalysis(result);
+    } catch (err) {
+      console.error('Analysis error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze team';
+      
+      if (errorMessage.includes('not available') || errorMessage.includes('API key')) {
+        setError('AI analysis is currently unavailable. Please check your API key configuration in the .env file.');
+      } else {
+        setError(errorMessage);
+      }
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const getRatingColor = (rating: number): string => {
+    if (rating >= 9) return 'text-green-600';
+    if (rating >= 7) return 'text-blue-600';
+    if (rating >= 5) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getRatingBadgeVariant = (rating: number) => {
+    if (rating >= 9) return 'default';
+    if (rating >= 7) return 'secondary';
+    if (rating >= 5) return 'outline';
+    return 'destructive';
+  };
+
+  return (
+    <div className={`space-y-6 ${className}`}>
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <Brain className="w-6 h-6 text-purple-500" />
+        <h1 className="text-2xl font-bold">AI Team Analyzer</h1>
+        <Sparkles className="w-5 h-5 text-yellow-500" />
+      </div>
+
+      {/* Team Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Select Team to Analyze
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Select value={selectedTeam?.id || ''} onValueChange={(value) => {
+                const team = teams.find(t => t.id === value);
+                setSelectedTeam(team || null);
+                setAnalysis(null); // Clear previous analysis
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a team to analyze" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.id}>
+                      {team.name} ({team.pokemon.length}/6 Pokémon)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Button
+              onClick={analyzeTeam}
+              disabled={!selectedTeam || selectedTeam.pokemon.length === 0 || isAnalyzing}
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Brain className="w-4 h-4 mr-2" />
+                  Analyze Team
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Team Preview */}
+          {selectedTeam && (
+            <div className="border rounded-lg p-4 bg-gray-50">
+              <h3 className="font-medium mb-2">{selectedTeam.name}</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedTeam.pokemon.map((tp, index) => (
+                  <div key={`team-pokemon-${tp.pokemon.id}-${index}`} className="flex items-center gap-2 bg-white rounded px-2 py-1 text-sm">
+                    <span className="font-medium">{tp.pokemon.name}</span>
+                    <div className="flex gap-1">
+                      {tp.pokemon.types.map((type, typeIndex) => (
+                        <Badge
+                          key={`team-${tp.pokemon.id}-${type.type.name}-${typeIndex}`}
+                          variant="secondary"
+                          className="text-xs"
+                        >
+                          {type.type.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!selectedTeam && teams.length === 0 && (
+            <p className="text-center text-gray-500 py-4">
+              No teams available. Create a team in the Team Builder first.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Error Display */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="w-5 h-5" />
+                <span className="font-medium">Analysis Failed</span>
+              </div>
+              <p className="text-red-700 mt-2">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={analyzeTeam}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Analysis Results */}
+      <AnimatePresence>
+        {analysis && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
+          >
+            {/* Professor's Comment */}
+            <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    👨‍🔬
+                  </div>
+                  Professor Oak&apos;s Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <p className="text-lg italic text-gray-700 leading-relaxed">
+                      &ldquo;{analysis.synergy.explanation}&rdquo;
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold mb-1">
+                      <span className={getRatingColor(analysis.overallRating)}>
+                        {analysis.overallRating}/10
+                      </span>
+                    </div>
+                    <Badge variant={getRatingBadgeVariant(analysis.overallRating)}>
+                      Overall Rating
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Strengths */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-600">
+                    <CheckCircle className="w-5 h-5" />
+                    Team Strengths
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {analysis.strengths.map((strength, index) => (
+                      <motion.div
+                        key={`strength-${index}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-start gap-2"
+                      >
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{strength}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Weaknesses */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-600">
+                    <AlertTriangle className="w-5 h-5" />
+                    Areas for Improvement
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {analysis.weaknesses.map((weakness, index) => (
+                      <motion.div
+                        key={`weakness-${index}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-start gap-2"
+                      >
+                        <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{weakness}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Role Analysis */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Team Roles
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="font-medium text-green-600 mb-2">Current Roles</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(analysis.roleAnalysis.roles).map(([role, pokemon], index) => (
+                        <Badge key={`role-${role}-${index}`} variant="secondary" className="bg-green-100 text-green-800">
+                          {role}: {pokemon.join(', ')}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {analysis.roleAnalysis.missingRoles.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-orange-600 mb-2">Missing Roles</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {analysis.roleAnalysis.missingRoles.map((role, index) => (
+                          <Badge key={`missing-role-${role}-${index}`} variant="outline" className="border-orange-300 text-orange-700">
+                            {role}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Type Coverage */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Type Coverage
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="font-medium text-blue-600 mb-2">Good Coverage</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {analysis.typeBalance.coverage.map((type, index) => (
+                        <Badge key={`coverage-${type}-${index}`} variant="secondary" className="bg-blue-100 text-blue-800">
+                          {type}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {analysis.typeBalance.gaps.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-red-600 mb-2">Coverage Gaps</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {analysis.typeBalance.gaps.map((type, index) => (
+                          <Badge key={`gap-${type}-${index}`} variant="outline" className="border-red-300 text-red-700">
+                            {type}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Suggestions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-600">
+                  <Lightbulb className="w-5 h-5" />
+                  Improvement Suggestions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {analysis.suggestions.map((suggestion, index) => (
+                    <motion.div
+                      key={`suggestion-${index}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg"
+                    >
+                      <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="text-sm font-medium text-blue-900">
+                          Suggestion {index + 1}:
+                        </span>
+                        <p className="text-sm text-blue-800 mt-1">{suggestion}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
