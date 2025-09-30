@@ -192,16 +192,8 @@ const translations = {
     'edit': 'Edit',
     'name': 'Name',
     'id': 'ID',
-    'hp': 'HP',
-    'attack': 'Attack',
-    'defense': 'Defense',
-    'speed': 'Speed',
-    'special_attack': 'Sp. Attack',
-    'special_defense': 'Sp. Defense',
 
     // Additional translations for hardcoded texts
-    'pokedex_explorer': 'Pokédex Explorer',
-    'discover_explore': 'Discover & Explore',
     'team_builder_title': 'Team Builder',
     'build_manage': 'Build & Manage',
     'ai_team_analyzer_title': 'AI Team Analyzer',
@@ -217,7 +209,17 @@ const translations = {
     'team_resistances': 'Team Resistances',
     'add_pokemon': 'Add Pokemon',
     'add_pokemon_to_team': 'Add Pokemon to Team',
-    'pokemon': 'Pokemons'
+    'pokemon': 'Pokemons',
+
+    // Trainer names and descriptions
+    'champion_red': 'Champion Red',
+    'champion_red_description': 'The legendary trainer from Mount Silver. His team is perfectly balanced and extremely powerful.',
+    'elite_four_lance': 'Elite Four Lance',
+    'elite_four_lance_description': 'The Dragon Master of the Elite Four. Specializes in Dragon-type Pokémon.',
+    'gym_leader_brock': 'Gym Leader Brock',
+    'gym_leader_brock_description': 'The Rock-type Gym Leader of Pewter City. A great trainer for beginners.',
+    'rival_blue': 'Rival Blue',
+    'rival_blue_description': 'Your long-time rival. His team is well balanced and competitive.'
   },
   'pt-BR': {
     // Header
@@ -391,16 +393,8 @@ const translations = {
     'edit': 'Editar',
     'name': 'Nome',
     'id': 'ID',
-    'hp': 'HP',
-    'attack': 'Ataque',
-    'defense': 'Defesa',
-    'speed': 'Velocidade',
-    'special_attack': 'Ataque Esp.',
-    'special_defense': 'Defesa Esp.',
 
     // Additional translations for hardcoded texts
-    'pokedex_explorer': 'Explorador Pokédex',
-    'discover_explore': 'Descobrir & Explorar',
     'team_builder_title': 'Construtor de Times',
     'build_manage': 'Construir & Gerenciar',
     'ai_team_analyzer_title': 'Analisador de Time IA',
@@ -415,14 +409,23 @@ const translations = {
     'export': 'Exportar',
     'import': 'Importar',
     'teams': 'Times',
-    'discover_pokemon': 'Conheça novos pokemons!',
     'average_stats': 'Estatísticas Médias',
     'type_distribution': 'Distribuição de Tipos',
     'team_weaknesses': 'Fraquezas do Time',
     'team_resistances': 'Resistências do Time',
     'add_pokemon': 'Adicionar Pokemon',
     'add_pokemon_to_team': 'Adicionar Pokemon ao Time',
-    'pokemon': 'Pokemons'
+    'pokemon': 'Pokemons',
+
+    // Trainer names and descriptions
+    'champion_red': 'Campeão Red',
+    'champion_red_description': 'O lendário treinador do Monte Silver. Sua equipe é perfeitamente equilibrada e extremamente poderosa.',
+    'elite_four_lance': 'Elite Four Lance',
+    'elite_four_lance_description': 'O Mestre dos Dragões do Elite Four. Especializa-se em Pokémon do tipo Dragão.',
+    'gym_leader_brock': 'Líder de Ginásio Brock',
+    'gym_leader_brock_description': 'O Líder de Ginásio do tipo Pedra de Pewter City. Um ótimo treinador para iniciantes.',
+    'rival_blue': 'Rival Blue',
+    'rival_blue_description': 'Seu rival de longa data. Sua equipe é bem equilibrada e competitiva.'
   }
 };
 

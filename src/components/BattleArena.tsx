@@ -251,9 +251,45 @@ export function BattleArena({ className }: BattleArenaProps) {
                 }`}
                 onClick={() => setSelectedTrainer(trainer)}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium">{trainer.name}</h3>
-                  <div className="flex items-center gap-2">
+                <div className="flex items-start gap-3 mb-3">
+                  {/* Trainer Avatar */}
+                  {trainer.avatar && (
+                    <div className="flex-shrink-0">
+                      <Image 
+                        src={trainer.avatar} 
+                        alt={t(trainer.name)}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 object-contain rounded-lg border border-gray-200"
+                        onError={(e) => {
+                          // Hide image if it fails to load
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Trainer Info */}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">{t(trainer.name)}</h3>
+                      <Badge 
+                        variant={
+                          trainer.difficulty === 'easy' ? 'secondary' :
+                          trainer.difficulty === 'medium' ? 'default' :
+                          trainer.difficulty === 'hard' ? 'destructive' : 
+                          trainer.difficulty === 'legendary' ? 'destructive' : 'default'
+                        }
+                        className={
+                          trainer.difficulty === 'easy' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
+                          trainer.difficulty === 'hard' ? 'bg-red-900 text-red-100 hover:bg-red-800' :
+                          ''
+                        }
+                      >
+                        {t(trainer.difficulty)}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{t(trainer.description || '')}</p>
                     <Button variant="outline" size="sm" onClick={(e) => {
                       e.stopPropagation();
                       setViewingTrainer(trainer);
@@ -261,27 +297,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                     }}>
                        {t('view_team')}
                     </Button>
-                    <Badge variant={
-                      trainer.difficulty === 'easy' ? 'secondary' :
-                      trainer.difficulty === 'medium' ? 'default' :
-                      trainer.difficulty === 'hard' ? 'destructive' : 
-                      trainer.difficulty === 'legendary' ? 'destructive' : 'default'
-                    }>
-                      {t(trainer.difficulty)}
-                    </Badge>
                   </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">{trainer.description}</p>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-500">{t('team')}:</span>
-                  {trainer.team.slice(0, 3).map((pokemon, index) => (
-                    <Badge key={`${trainer.id}-${pokemon.name}-${index}`} variant="outline" className="text-xs">
-                      {pokemon.name}
-                    </Badge>
-                  ))}
-                  {trainer.team.length > 3 && (
-                    <span className="text-xs text-gray-500">+{trainer.team.length - 3} {t('more')}</span>
-                  )}
                 </div>
               </motion.div>
             ))}
@@ -292,35 +308,29 @@ export function BattleArena({ className }: BattleArenaProps) {
         <Dialog open={showOpponentTeam} onOpenChange={setShowOpponentTeam}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
-              <DialogTitle>{t('team_of')} {viewingTrainer?.name}</DialogTitle>
+              <DialogTitle>{t('team_of')} {t(viewingTrainer?.name || '')}</DialogTitle>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
               {viewingTrainer?.team?.map((pokemon, index) => {
                 // Função para obter o ID do Pokémon baseado no nome
                 const getPokemonId = (name: string): string => {
                   const pokemonIds: Record<string, string> = {
-                    'pikachu': '25',
-                    'charizard': '6',
-                    'venusaur': '3',
-                    'blastoise': '9',
-                    'lapras': '131',
-                    'snorlax': '143',
-                    'dragonite': '149',
-                    'aerodactyl': '142',
-                    'gyarados': '130',
-                    'geodude': '74',
-                    'onix': '95',
-                    'pidgeot': '18',
-                    'rhydon': '112',
-                    'arcanine': '59',
-                    'tyranitar': '248',
-                    'pidgeot': '18',
-                    'rhydon': '112',
-                    'gyarados': '130',
-                    'arcanine': '59',
-                    'tyranitar': '248',
-                    'venusaur': '3'
-                  };
+                  'pikachu': '25',
+                  'charizard': '6',
+                  'venusaur': '3',
+                  'blastoise': '9',
+                  'lapras': '131',
+                  'snorlax': '143',
+                  'dragonite': '149',
+                  'aerodactyl': '142',
+                  'gyarados': '130',
+                  'geodude': '74',
+                  'onix': '95',
+                  'pidgeot': '18',
+                  'rhydon': '112',
+                  'arcanine': '59',
+                  'tyranitar': '248'
+                };
                   return pokemonIds[name] || '1'; // Fallback para Bulbasaur se não encontrar
                 };
 

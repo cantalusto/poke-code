@@ -9,6 +9,30 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/PokeAPI/sprites/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'art.pixilart.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pa1.aminoapps.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'fc06.deviantart.net',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

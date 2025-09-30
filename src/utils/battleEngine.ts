@@ -36,8 +36,9 @@ const TYPE_EFFECTIVENESS: TypeEffectiveness = {
 export const AI_TRAINERS: AITrainer[] = [
   {
     id: 'champion-red',
-    name: 'Champion Red',
+    name: 'champion_red', // Translation key
     difficulty: 'legendary',
+    avatar: 'https://art.pixilart.com/a6d87953f082.gif',
     team: [
       { name: 'pikachu', level: 81 },
       { name: 'charizard', level: 77 },
@@ -47,12 +48,13 @@ export const AI_TRAINERS: AITrainer[] = [
       { name: 'snorlax', level: 75 }
     ],
     strategy: 'aggressive',
-    description: 'The legendary trainer from Mt. Silver. His team is perfectly balanced and extremely powerful.'
+    description: 'champion_red_description' // Translation key
   },
   {
-    id: 'elite-four-lance',
-    name: 'Elite Four Lance',
+    id: 'lance',
+    name: 'elite_four_lance', // Translation key
     difficulty: 'hard',
+    avatar: 'https://pa1.aminoapps.com/6291/b1a3964d1c52c3bb1a8e4ccb31dda92413494d03_00.gif',
     team: [
       { name: 'dragonite', level: 62 },
       { name: 'dragonite', level: 64 },
@@ -62,23 +64,25 @@ export const AI_TRAINERS: AITrainer[] = [
       { name: 'dragonite', level: 66 }
     ],
     strategy: 'defensive',
-    description: 'The Dragon Master of the Elite Four. Specializes in Dragon-type Pokémon.'
+    description: 'elite_four_lance_description' // Translation key
   },
   {
-    id: 'gym-leader-brock',
-    name: 'Gym Leader Brock',
+    id: 'brock',
+    name: 'gym_leader_brock', // Translation key
     difficulty: 'easy',
+    avatar: 'https://fc06.deviantart.net/fs70/f/2014/105/d/a/tppfr_brock_animbig_by_bhaumat-d7emwmk.gif',
     team: [
       { name: 'geodude', level: 12 },
       { name: 'onix', level: 14 }
     ],
     strategy: 'balanced',
-    description: 'The Rock-type Gym Leader of Pewter City. A great trainer for beginners.'
+    description: 'gym_leader_brock_description' // Translation key
   },
   {
-    id: 'rival-blue',
-    name: 'Rival Blue',
+    id: 'blue',
+    name: 'rival_blue', // Translation key
     difficulty: 'medium',
+    avatar: 'https://i.imgur.com/tv4cHR1.gif',
     team: [
       { name: 'pidgeot', level: 56 },
       { name: 'rhydon', level: 56 },
@@ -88,7 +92,7 @@ export const AI_TRAINERS: AITrainer[] = [
       { name: 'venusaur', level: 60 }
     ],
     strategy: 'aggressive',
-    description: 'Your longtime rival. His team is well-rounded and competitive.'
+    description: 'rival_blue_description' // Translation key
   }
 ];
 

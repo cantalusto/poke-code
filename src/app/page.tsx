@@ -42,8 +42,46 @@ export default function Home() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center relative">
+                {/* Pokeball SVG */}
+                <svg 
+                  width="24" 
+                  height="24" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-white"
+                >
+                  {/* Top half */}
+                  <path 
+                    d="M12 2C17.52 2 22 6.48 22 12H14C14 10.9 13.1 10 12 10C10.9 10 10 10.9 10 12H2C2 6.48 6.48 2 12 2Z" 
+                    fill="currentColor"
+                  />
+                  {/* Bottom half */}
+                  <path 
+                    d="M2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12H14C14 13.1 13.1 14 12 14C10.9 14 10 13.1 10 12H2Z" 
+                    fill="currentColor" 
+                    fillOpacity="0.7"
+                  />
+                  {/* Center circle */}
+                  <circle 
+                    cx="12" 
+                    cy="12" 
+                    r="2" 
+                    fill="currentColor"
+                    stroke="white" 
+                    strokeWidth="1"
+                  />
+                  {/* Center line */}
+                  <line 
+                    x1="2" 
+                    y1="12" 
+                    x2="22" 
+                    y2="12" 
+                    stroke="white" 
+                    strokeWidth="1"
+                  />
+                </svg>
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
