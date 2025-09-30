@@ -142,8 +142,13 @@ export class BattleEngine {
     };
 
     // Set initial active Pokémon
-    this.battleState.currentPlayerPokemon = this.battleState.playerTeam[0] || null;
-    this.battleState.currentOpponentPokemon = this.battleState.opponentTeam[0] || null;
+    this.battleState.currentPlayerPokemon = this.battleState.playerTeam.find(p => !p.fainted) || null;
+    this.battleState.currentOpponentPokemon = this.battleState.opponentTeam.find(p => !p.fainted) || null;
+
+    // Set battle phase to battle if we have valid Pokémon
+    if (this.battleState.currentPlayerPokemon && this.battleState.currentOpponentPokemon) {
+      this.battleState.phase = 'battle';
+    }
 
     this.battleLog = [];
     this.addLogEntry('battle-start', 'The battle begins!');

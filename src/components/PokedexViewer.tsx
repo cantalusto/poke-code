@@ -44,7 +44,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [selectedGeneration, setSelectedGeneration] = useState<string>('');
+  const [selectedGeneration, setSelectedGeneration] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'id' | 'name' | 'hp' | 'attack' | 'defense' | 'speed'>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -185,7 +185,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
     }
 
     // Apply generation filter (simplified - would need more complex logic for actual generations)
-    if (selectedGeneration) {
+    if (selectedGeneration && selectedGeneration !== 'all') {
       // For demo, we'll filter by ID ranges
       const genRanges: Record<string, [number, number]> = {
         'generation-i': [1, 151],
@@ -271,7 +271,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedTypes([]);
-    setSelectedGeneration('');
+    setSelectedGeneration('all');
     setCurrentPage(1);
   };
 
@@ -418,7 +418,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
                         <SelectValue placeholder="All generations" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All generations</SelectItem>
+                        <SelectItem value="all">All generations</SelectItem>
                         {GENERATIONS.map((gen) => (
                           <SelectItem key={gen.value} value={gen.value}>
                             {gen.label}
