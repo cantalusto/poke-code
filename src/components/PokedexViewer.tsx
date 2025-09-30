@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { PokemonCard } from './PokemonCard';
-import { Pokemon } from '@/types/pokemon';
+import { Pokemon, PokemonTeam, TeamPokemon } from '@/types/pokemon';
 import { pokeApiService } from '@/services/pokeapi';
-import { Search, Filter, Grid, List, Shuffle, Loader2 } from 'lucide-react';
+import { TeamStorageService } from '@/utils/teamStorage';
+import { Search, Filter, Grid, List, Shuffle, Loader2, Users, Plus } from 'lucide-react';
 
 interface PokedexViewerProps {
   onAddToTeam?: (pokemon: Pokemon) => void;
@@ -50,6 +51,11 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   
+  // Team management states
+  const [teams, setTeams] = useState<PokemonTeam[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<PokemonTeam | null>(null);
+  const [showTeamSelector, setShowTeamSelector] = useState(false);
+  
   const itemsPerPage = 20;
 
   // Load initial Pokemon data
@@ -68,6 +74,95 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
 
     loadPokemon();
   }, []);
+
+  // Load teams on component mount
+  useEffect(() => {
+    const loadedTeams = TeamStorageService.getTeams();
+    setTeams(loadedTeams);
+    if (loadedTeams.length > 0 && !selectedTeam) {
+      setSelectedTeam(loadedTeams[0]);
+    }
+  }, []);
+
+  // Function to add Pokemon to selected team
+  const addPokemonToTeam = async (pokemon: Pokemon) => {
+    if (!selectedTeam) {
+      alert('Por favor, selecione um time primeiro!');
+      return;
+    }
+    
+    try {
+      // Get basic moves for the Pokemon
+      const basicMoves = ['tackle', 'quick-attack'];
+      
+      // Add type-specific move based on primary type
+      const primaryType = pokemon.types[0]?.type.name;
+      if (primaryType) {
+        const typeMove = getTypeSpecificMove(primaryType);
+        if (typeMove) {
+          basicMoves.push(typeMove);
+        }
+      }
+      
+      // Add a fourth move
+      basicMoves.push('body-slam');
+      
+      const teamPokemon: TeamPokemon = {
+        pokemon,
+        nickname: pokemon.name,
+        level: 50,
+        moves: basicMoves
+      };
+      
+      const updatedTeam = TeamStorageService.addPokemonToTeam(selectedTeam, teamPokemon);
+      setSelectedTeam(updatedTeam);
+      
+      const updatedTeams = TeamStorageService.getTeams();
+      setTeams(updatedTeams);
+      
+      alert(`${pokemon.name} foi adicionado ao time ${selectedTeam.name}!`);
+    } catch (error) {
+      console.error('Error adding Pokémon to team:', error);
+      alert(error instanceof Error ? error.message : 'Falha ao adicionar Pokémon ao time');
+    }
+  };
+
+  // Helper function to get type-specific moves
+  const getTypeSpecificMove = (type: string): string | null => {
+    const typeMoves: Record<string, string> = {
+      fire: 'ember',
+      water: 'water-gun',
+      grass: 'vine-whip',
+      electric: 'thunder-shock',
+      psychic: 'confusion',
+      ice: 'ice-beam',
+      dragon: 'dragon-rage',
+      dark: 'bite',
+      fighting: 'karate-chop',
+      poison: 'poison-sting',
+      ground: 'mud-slap',
+      flying: 'gust',
+      bug: 'bug-bite',
+      rock: 'rock-throw',
+      ghost: 'lick',
+      steel: 'metal-claw',
+      fairy: 'fairy-wind'
+    };
+    
+    return typeMoves[type] || null;
+  };
+
+  // Function to create a new team
+  const createNewTeam = () => {
+    const teamName = prompt('Digite o nome do novo time:');
+    if (teamName && teamName.trim()) {
+      const newTeam = TeamStorageService.createTeam(teamName.trim());
+      TeamStorageService.saveTeam(newTeam);
+      const updatedTeams = TeamStorageService.getTeams();
+      setTeams(updatedTeams);
+      setSelectedTeam(newTeam);
+    }
+  };
 
   // Search and filter logic
   const filteredPokemon = useMemo(() => {
@@ -223,6 +318,36 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
             </div>
             
             <div className="flex gap-2">
+              {/* Team Selector */}
+              <Select
+                value={selectedTeam?.id || ''}
+                onValueChange={(value) => {
+                  const team = teams.find(t => t.id === value);
+                  setSelectedTeam(team || null);
+                }}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <Users className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Selecionar Time" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.id}>
+                      {team.name} ({team.pokemon.length}/6)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={createNewTeam}
+                title="Criar Novo Time"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+              
               <Button
                 variant="outline"
                 size="sm"
@@ -369,8 +494,9 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
             >
               <PokemonCard
                 pokemon={pokemon}
-                onAddToTeam={onAddToTeam}
+                onAddToTeam={addPokemonToTeam}
                 onViewDetails={onViewDetails}
+                showAddButton={true}
                 className={viewMode === 'list' ? 'h-full' : ''}
               />
             </motion.div>

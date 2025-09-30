@@ -101,10 +101,26 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
     if (!selectedTeam) return;
     
     try {
+      // Get basic moves for the Pokemon
+      const basicMoves = ['tackle', 'quick-attack'];
+      
+      // Add type-specific move based on primary type
+      const primaryType = pokemon.types[0]?.type.name;
+      if (primaryType) {
+        const typeMove = getTypeSpecificMove(primaryType);
+        if (typeMove) {
+          basicMoves.push(typeMove);
+        }
+      }
+      
+      // Add a fourth move
+      basicMoves.push('body-slam');
+      
       const teamPokemon: TeamPokemon = {
         pokemon,
         nickname: pokemon.name,
-        level: 50
+        level: 50,
+        moves: basicMoves
       };
       
       const updatedTeam = TeamStorageService.addPokemonToTeam(selectedTeam, teamPokemon);
@@ -120,6 +136,31 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
       console.error('Error adding Pokémon to team:', error);
       alert(error instanceof Error ? error.message : 'Failed to add Pokémon to team');
     }
+  };
+
+  // Helper function to get type-specific moves
+  const getTypeSpecificMove = (type: string): string | null => {
+    const typeMoves: Record<string, string> = {
+      fire: 'ember',
+      water: 'water-gun',
+      grass: 'vine-whip',
+      electric: 'thunder-shock',
+      psychic: 'confusion',
+      ice: 'ice-beam',
+      dragon: 'dragon-rage',
+      dark: 'bite',
+      fighting: 'karate-chop',
+      poison: 'poison-sting',
+      ground: 'mud-slap',
+      flying: 'gust',
+      bug: 'bug-bite',
+      rock: 'rock-throw',
+      ghost: 'lick',
+      steel: 'metal-claw',
+      fairy: 'fairy-wind'
+    };
+    
+    return typeMoves[type] || null;
   };
 
   const removePokemonFromTeam = (index: number) => {

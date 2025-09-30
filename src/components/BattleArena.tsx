@@ -83,7 +83,7 @@ export function BattleArena({ className }: BattleArenaProps) {
             };
           } catch (error) {
             console.error(`Failed to load ${aiPokemon.name}:`, error);
-            // Return a fallback Pokémon
+            // Return a fallback Pokémon with basic moves
             return {
               pokemon: {
                 id: 1,
@@ -103,7 +103,12 @@ export function BattleArena({ className }: BattleArenaProps) {
                 ],
                 sprites: { front_default: null, back_default: null },
                 abilities: [],
-                moves: []
+                moves: [
+                  { move: { name: 'tackle', url: '' } },
+                  { move: { name: 'quick-attack', url: '' } },
+                  { move: { name: 'body-slam', url: '' } },
+                  { move: { name: 'double-edge', url: '' } }
+                ]
               } as unknown as Pokemon,
               nickname: aiPokemon.name,
               level: aiPokemon.level

@@ -21,10 +21,10 @@ class GeminiService {
   private model: GenerativeModel | null;
 
   constructor() {
-    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY;
     
     if (!apiKey) {
-      console.warn('GOOGLE_GEMINI_API_KEY is not set in environment variables. AI features will be disabled.');
+      console.warn('NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY is not set in environment variables. AI features will be disabled.');
       this.genAI = null;
       this.model = null;
       return;
@@ -33,7 +33,7 @@ class GeminiService {
     try {
       this.genAI = new GoogleGenerativeAI(apiKey);
       this.model = this.genAI.getGenerativeModel({ 
-        model: process.env.GEMINI_MODEL || 'gemini-1.5-flash' 
+        model: process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-2.5-flash' 
       });
     } catch (error) {
       console.error('Failed to initialize Gemini AI:', error);

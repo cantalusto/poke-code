@@ -170,35 +170,43 @@ export class BattleEngine {
     const spDefense = Math.floor(((2 * baseSpDefense + 31) * level) / 100) + 5;
     const speed = Math.floor(((2 * baseSpeed + 31) * level) / 100) + 5;
 
-    // Create basic moves (simplified)
-    const moves: BattleMove[] = [
-      {
-        name: 'Tackle',
-        type: 'normal',
-        power: 40,
-        accuracy: 100,
-        pp: 35,
-        maxPp: 35,
-        currentPp: 35,
-        category: 'physical'
-      },
-      {
-        name: 'Quick Attack',
-        type: 'normal',
-        power: 40,
-        accuracy: 100,
-        pp: 30,
-        maxPp: 30,
-        currentPp: 30,
-        category: 'physical',
-        priority: 1
-      }
-    ];
+    // Create moves - use team moves if available, otherwise use default moves
+    let moves: BattleMove[] = [];
+    
+    if (teamPokemon.moves && teamPokemon.moves.length > 0) {
+      // Convert team moves to battle moves
+      moves = teamPokemon.moves.map(moveName => this.createBattleMoveFromName(moveName));
+    } else {
+      // Fallback to default moves
+      moves = [
+        {
+          name: 'Tackle',
+          type: 'normal',
+          power: 40,
+          accuracy: 100,
+          pp: 35,
+          maxPp: 35,
+          currentPp: 35,
+          category: 'physical'
+        },
+        {
+          name: 'Quick Attack',
+          type: 'normal',
+          power: 40,
+          accuracy: 100,
+          pp: 30,
+          maxPp: 30,
+          currentPp: 30,
+          category: 'physical',
+          priority: 1
+        }
+      ];
 
-    // Add type-specific moves
-    const primaryType = pokemon.types[0]?.type.name;
-    if (primaryType) {
-      moves.push(this.getTypeMove(primaryType));
+      // Add type-specific moves
+      const primaryType = pokemon.types[0]?.type.name;
+      if (primaryType) {
+        moves.push(this.getTypeMove(primaryType));
+      }
     }
 
     return {
@@ -218,6 +226,47 @@ export class BattleEngine {
       moves,
       status: null,
       fainted: false
+    };
+  }
+
+  // Helper method to create battle move from move name
+  private createBattleMoveFromName(moveName: string): BattleMove {
+    const moveData: Record<string, Partial<BattleMove>> = {
+      'tackle': { name: 'Tackle', type: 'normal', power: 40, accuracy: 100, pp: 35, category: 'physical' },
+      'quick-attack': { name: 'Quick Attack', type: 'normal', power: 40, accuracy: 100, pp: 30, category: 'physical', priority: 1 },
+      'body-slam': { name: 'Body Slam', type: 'normal', power: 85, accuracy: 100, pp: 15, category: 'physical' },
+      'double-edge': { name: 'Double-Edge', type: 'normal', power: 120, accuracy: 100, pp: 15, category: 'physical' },
+      'ember': { name: 'Ember', type: 'fire', power: 40, accuracy: 100, pp: 25, category: 'special' },
+      'water-gun': { name: 'Water Gun', type: 'water', power: 40, accuracy: 100, pp: 25, category: 'special' },
+      'vine-whip': { name: 'Vine Whip', type: 'grass', power: 45, accuracy: 100, pp: 25, category: 'physical' },
+      'thunder-shock': { name: 'Thunder Shock', type: 'electric', power: 40, accuracy: 100, pp: 30, category: 'special' },
+      'confusion': { name: 'Confusion', type: 'psychic', power: 50, accuracy: 100, pp: 25, category: 'special' },
+      'ice-beam': { name: 'Ice Beam', type: 'ice', power: 90, accuracy: 100, pp: 10, category: 'special' },
+      'dragon-rage': { name: 'Dragon Rage', type: 'dragon', power: 40, accuracy: 100, pp: 10, category: 'special' },
+      'bite': { name: 'Bite', type: 'dark', power: 60, accuracy: 100, pp: 25, category: 'physical' },
+      'karate-chop': { name: 'Karate Chop', type: 'fighting', power: 50, accuracy: 100, pp: 25, category: 'physical' },
+      'poison-sting': { name: 'Poison Sting', type: 'poison', power: 15, accuracy: 100, pp: 35, category: 'physical' },
+      'mud-slap': { name: 'Mud-Slap', type: 'ground', power: 20, accuracy: 100, pp: 10, category: 'special' },
+      'gust': { name: 'Gust', type: 'flying', power: 40, accuracy: 100, pp: 35, category: 'special' },
+      'bug-bite': { name: 'Bug Bite', type: 'bug', power: 60, accuracy: 100, pp: 20, category: 'physical' },
+      'rock-throw': { name: 'Rock Throw', type: 'rock', power: 50, accuracy: 90, pp: 15, category: 'physical' },
+      'lick': { name: 'Lick', type: 'ghost', power: 30, accuracy: 100, pp: 30, category: 'physical' },
+      'metal-claw': { name: 'Metal Claw', type: 'steel', power: 50, accuracy: 95, pp: 35, category: 'physical' },
+      'fairy-wind': { name: 'Fairy Wind', type: 'fairy', power: 40, accuracy: 100, pp: 30, category: 'special' }
+    };
+
+    const move = moveData[moveName.toLowerCase()] || moveData['tackle'];
+    
+    return {
+      name: move.name || 'Tackle',
+      type: move.type || 'normal',
+      power: move.power || 40,
+      accuracy: move.accuracy || 100,
+      pp: move.pp || 35,
+      maxPp: move.pp || 35,
+      currentPp: move.pp || 35,
+      category: move.category || 'physical',
+      priority: move.priority || 0
     };
   }
 
