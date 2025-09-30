@@ -128,6 +128,11 @@ const translations = {
     'easy': 'Easy',
     'medium': 'Medium',
     'hard': 'Hard',
+    'legendary': 'Legendary',
+    'more': 'more',
+    'view_team': 'View Team',
+    'team_of': 'Team of',
+    'level': 'Level',
     'team': 'Team',
 
     // AITeamAnalyzer
@@ -329,6 +334,11 @@ const translations = {
     'easy': 'Fácil',
     'medium': 'Médio',
     'hard': 'Difícil',
+    'legendary': 'Lendário',
+    'more': 'mais',
+    'view_team': 'Ver Equipe',
+    'team_of': 'Equipe de',
+    'level': 'Nível',
     'team': 'Time',
 
     // AITeamAnalyzer

@@ -47,6 +47,8 @@ export function BattleArena({ className }: BattleArenaProps) {
   const [playerTeams, setPlayerTeams] = useState<PokemonTeam[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showOpponentTeam, setShowOpponentTeam] = useState(false);
+  const [viewingTrainer, setViewingTrainer] = useState<AITrainer | null>(null);
   const [showBattleSetup, setShowBattleSetup] = useState(true);
   const logRef = useRef<HTMLDivElement>(null);
 
@@ -251,13 +253,23 @@ export function BattleArena({ className }: BattleArenaProps) {
               >
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium">{trainer.name}</h3>
-                  <Badge variant={
-                    trainer.difficulty === 'easy' ? 'secondary' :
-                    trainer.difficulty === 'medium' ? 'default' :
-                    trainer.difficulty === 'hard' ? 'destructive' : 'default'
-                  }>
-                    {trainer.difficulty}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={(e) => {
+                      e.stopPropagation();
+                      setViewingTrainer(trainer);
+                      setShowOpponentTeam(true);
+                    }}>
+                       {t('view_team')}
+                    </Button>
+                    <Badge variant={
+                      trainer.difficulty === 'easy' ? 'secondary' :
+                      trainer.difficulty === 'medium' ? 'default' :
+                      trainer.difficulty === 'hard' ? 'destructive' : 
+                      trainer.difficulty === 'legendary' ? 'destructive' : 'default'
+                    }>
+                      {t(trainer.difficulty)}
+                    </Badge>
+                  </div>
                 </div>
                 <p className="text-sm text-gray-600 mb-2">{trainer.description}</p>
                 <div className="flex items-center gap-1">
@@ -268,13 +280,77 @@ export function BattleArena({ className }: BattleArenaProps) {
                     </Badge>
                   ))}
                   {trainer.team.length > 3 && (
-                    <span className="text-xs text-gray-500">+{trainer.team.length - 3} more</span>
+                    <span className="text-xs text-gray-500">+{trainer.team.length - 3} {t('more')}</span>
                   )}
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
+
+        {/* Global Opponent Team Modal */}
+        <Dialog open={showOpponentTeam} onOpenChange={setShowOpponentTeam}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>{t('team_of')} {viewingTrainer?.name}</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+              {viewingTrainer?.team?.map((pokemon, index) => {
+                // Função para obter o ID do Pokémon baseado no nome
+                const getPokemonId = (name: string): string => {
+                  const pokemonIds: Record<string, string> = {
+                    'pikachu': '25',
+                    'charizard': '6',
+                    'venusaur': '3',
+                    'blastoise': '9',
+                    'lapras': '131',
+                    'snorlax': '143',
+                    'dragonite': '149',
+                    'aerodactyl': '142',
+                    'gyarados': '130',
+                    'geodude': '74',
+                    'onix': '95',
+                    'pidgeot': '18',
+                    'rhydon': '112',
+                    'arcanine': '59',
+                    'tyranitar': '248',
+                    'pidgeot': '18',
+                    'rhydon': '112',
+                    'gyarados': '130',
+                    'arcanine': '59',
+                    'tyranitar': '248',
+                    'venusaur': '3'
+                  };
+                  return pokemonIds[name] || '1'; // Fallback para Bulbasaur se não encontrar
+                };
+
+                const pokemonId = getPokemonId(pokemon.name);
+                const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
+
+                return (
+                   <div key={`${viewingTrainer?.id}-team-${pokemon.name}-${index}`} className="border rounded-lg p-3 text-center">
+                    <div className="mb-2">
+                      <Image
+                        src={imageUrl}
+                        alt={pokemon.name}
+                        width={96}
+                        height={96}
+                        className="mx-auto"
+                        onError={(e) => {
+                          // Fallback para uma imagem genérica se falhar
+                          const target = e.target as HTMLImageElement;
+                          target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png`;
+                        }}
+                      />
+                    </div>
+                    <h4 className="font-medium capitalize">{pokemon.name.replace('-', ' ')}</h4>
+                    <p className="text-sm text-gray-500">{t('level')} {pokemon.level}</p>
+                  </div>
+                );
+              }) || []}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Start Battle Button */}
         <Button
