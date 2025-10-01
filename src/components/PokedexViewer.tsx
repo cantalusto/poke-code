@@ -277,7 +277,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold text-red-600">
           {t('pokedex')}
         </h1>
         <p className="text-muted-foreground">

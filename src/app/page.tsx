@@ -85,7 +85,7 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-red-600">
                   {t('pokemon_goat')}
                 </h1>
                 <p className="text-sm text-gray-500">{t('tagline')}</p>
@@ -152,8 +152,8 @@ export default function Home() {
               <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
-                    <Search className="w-6 h-6 text-blue-500" />
-                    <h2 className="text-xl font-semibold">{t('pokedex_explorer')}</h2>
+                    <Search className="w-6 h-6 text-red-600" />
+                    <h2 className="text-xl font-bold text-black">{t('pokedex_explorer')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Shield className="w-4 h-4" />
                       {t('discover_and_explore')}
@@ -177,8 +177,8 @@ export default function Home() {
               <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
-                    <Users className="w-6 h-6 text-green-500" />
-                    <h2 className="text-xl font-semibold">{t('team_builder')}</h2>
+                    <Users className="w-6 h-6 text-red-600" />
+                    <h2 className="text-xl font-bold text-black">{t('team_builder')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Shield className="w-4 h-4" />
                       {t('build_your_team')}
@@ -202,8 +202,8 @@ export default function Home() {
               <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
-                    <Brain className="w-6 h-6 text-purple-500" />
-                    <h2 className="text-xl font-semibold">{t('ai_analyzer')}</h2>
+                    <Brain className="w-6 h-6 text-red-600" />
+                    <h2 className="text-xl font-bold text-black">{t('ai_analyzer')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Sparkles className="w-4 h-4 text-yellow-500" />
                       {t('analyze_with_ai')}
@@ -227,8 +227,8 @@ export default function Home() {
               <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
-                    <Swords className="w-6 h-6 text-red-500" />
-                    <h2 className="text-xl font-semibold">{t('battle_arena')}</h2>
+                    <Swords className="w-6 h-6 text-red-600" />
+                    <h2 className="text-xl font-bold text-black">{t('battle_arena')}</h2>
                     <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
                       <Zap className="w-4 h-4 text-yellow-500" />
                       {t('battle_with_team')}
@@ -248,30 +248,30 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="bg-gradient-to-br from-blue-500 to-purple-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Search className="w-8 h-8 mx-auto mb-2" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('discover_pokemon')}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500 to-teal-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-white to-gray-100 text-gray-800 border-0 shadow-lg">
             <CardContent className="p-4 text-center">
-              <Users className="w-8 h-8 mx-auto mb-2" />
+              <Users className="w-8 h-8 mx-auto mb-2 text-gray-700" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('build_your_team')}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-500 to-pink-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Brain className="w-8 h-8 mx-auto mb-2" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('analyze_with_ai')}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-red-500 to-orange-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-white to-gray-100 text-gray-800 border-0 shadow-lg">
             <CardContent className="p-4 text-center">
-              <Swords className="w-8 h-8 mx-auto mb-2" />
+              <Swords className="w-8 h-8 mx-auto mb-2 text-gray-700" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('battle_with_team')}</p>
             </CardContent>
           </Card>
@@ -283,8 +283,8 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-blue-500" />
-              Poke-Code
+              <Sparkles className="w-5 h-5 text-red-600" />
+              <span className="text-red-600 font-semibold">Poke-Code</span>
             </div>
             <p className="text-sm text-gray-500 mb-4">
               {t('app_description')}

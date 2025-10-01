@@ -14,7 +14,7 @@ export function LanguageToggle() {
   return (
     <button
       onClick={toggleLanguage}
-      className="flex items-center gap-1 px-2 py-1 text-sm text-gray-500 hover:text-gray-700 transition-colors rounded-md hover:bg-gray-100"
+      className="flex items-center gap-1 px-2 py-1 text-sm text-gray-500 hover:bg-accent hover:text-accent-foreground transition-all rounded-md"
       title={language === 'en' ? t('switch_to_portuguese') : t('switch_to_english')}
     >
       <Globe className="w-4 h-4" />
