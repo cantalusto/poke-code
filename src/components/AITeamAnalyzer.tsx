@@ -47,7 +47,7 @@ interface AnalysisResult {
 }
 
 export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [teams, setTeams] = useState<PokemonTeam[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<PokemonTeam | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -74,7 +74,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
     setAnalysis(null);
 
     try {
-      const result = await geminiService.analyzeTeam(selectedTeam);
+      const result = await geminiService.analyzeTeam(selectedTeam, language);
       setAnalysis(result);
     } catch (err) {
       console.error('Analysis error:', err);

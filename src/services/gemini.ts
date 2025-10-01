@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { PokemonTeam, TeamAnalysis } from '@/types/pokemon';
+import { Language } from '@/contexts/LanguageContext';
 
 interface TeamImprovementSuggestion {
   replacements: Array<{
@@ -42,16 +43,22 @@ class GeminiService {
     }
   }
 
-  async analyzeTeam(team: PokemonTeam): Promise<TeamAnalysis> {
+  // Utility function to clean text from double asterisks
+  private cleanTextFormatting(text: string): string {
+    // Remove double asterisks used for bold formatting
+    return text.replace(/\*\*(.*?)\*\*/g, '$1');
+  }
+
+  async analyzeTeam(team: PokemonTeam, language: Language = 'en'): Promise<TeamAnalysis> {
     if (!this.model) {
       throw new Error('Gemini AI is not available. Please check your API key configuration.');
     }
 
     try {
-      const prompt = this.createTeamAnalysisPrompt(team);
+      const prompt = this.createTeamAnalysisPrompt(team, language);
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
-      const text = response.text();
+      const text = this.cleanTextFormatting(response.text());
       
       return this.parseAnalysisResponse(text);
     } catch (error) {
@@ -60,33 +67,33 @@ class GeminiService {
     }
   }
 
-  async getBattleStrategy(playerTeam: PokemonTeam, opponentTeam: PokemonTeam): Promise<string> {
+  async getBattleStrategy(playerTeam: PokemonTeam, opponentTeam: PokemonTeam, language: Language = 'en'): Promise<string> {
     if (!this.model) {
       throw new Error('Gemini AI is not available. Please check your API key configuration.');
     }
 
     try {
-      const prompt = this.createBattleStrategyPrompt(playerTeam, opponentTeam);
+      const prompt = this.createBattleStrategyPrompt(playerTeam, opponentTeam, language);
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       
-      return response.text();
+      return this.cleanTextFormatting(response.text());
     } catch (error) {
       console.error('Error getting battle strategy from Gemini:', error);
       throw new Error('Failed to get battle strategy. Please try again.');
     }
   }
 
-  async generateTeamSuggestions(currentTeam: PokemonTeam, targetRole?: string): Promise<string[]> {
+  async generateTeamSuggestions(currentTeam: PokemonTeam, targetRole?: string, language: Language = 'en'): Promise<string[]> {
     if (!this.model) {
       throw new Error('Gemini AI is not available. Please check your API key configuration.');
     }
 
     try {
-      const prompt = this.createTeamSuggestionPrompt(currentTeam, targetRole);
+      const prompt = this.createTeamSuggestionPrompt(currentTeam, targetRole, language);
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
-      const text = response.text();
+      const text = this.cleanTextFormatting(response.text());
       
       // Parse the response to extract Pokemon names
       const suggestions = this.parsePokemonSuggestions(text);
@@ -97,7 +104,7 @@ class GeminiService {
     }
   }
 
-  private createTeamAnalysisPrompt(team: PokemonTeam): string {
+  private createTeamAnalysisPrompt(team: PokemonTeam, language: Language = 'en'): string {
     const teamInfo = team.pokemon.map(tp => {
       const pokemon = tp.pokemon;
       const types = pokemon.types.map(t => t.type.name).join(', ');
@@ -107,7 +114,49 @@ class GeminiService {
       return `${pokemon.name} (${types}) - Stats: ${stats} - Abilities: ${abilities}`;
     }).join('\n');
 
-    return `You are Professor Oak, the renowned Pokémon researcher. Analyze this Pokémon team with your expertise and provide strategic insights in your characteristic warm, knowledgeable style.
+    const isPortuguese = language === 'pt-BR';
+    
+    const basePrompt = isPortuguese 
+      ? `Você é o Professor Carvalho, o renomado pesquisador Pokémon. Analise este time Pokémon com sua expertise e forneça insights estratégicos em seu estilo característico caloroso e conhecedor.
+
+IMPORTANTE: NÃO use asteriscos duplos (**) para formatação. Use apenas texto simples sem formatação especial.
+
+Time "${team.name}":
+${teamInfo}
+
+Por favor, forneça uma análise abrangente em formato JSON com a seguinte estrutura:
+{
+  "overallRating": <número de 1-10>,
+  "strengths": [<array de descrições de pontos fortes>],
+  "weaknesses": [<array de descrições de fraquezas>],
+  "suggestions": [<array de sugestões de melhoria>],
+  "roleAnalysis": {
+    "roles": {<nome_do_papel>: [<nomes_dos_pokemon>]},
+    "missingRoles": [<nomes_dos_papéis_ausentes>]
+  },
+  "typeBalance": {
+    "coverage": [<tipos_bem_cobertos>],
+    "gaps": [<tipos_mal_cobertos>],
+    "redundancies": [<tipos_super_representados>]
+  },
+  "synergy": {
+    "score": <número de 1-10>,
+    "explanation": "<explicação da sinergia do time>"
+  }
+}
+
+Considere estes aspectos:
+- Cobertura e equilíbrio de tipos
+- Distribuição de stats (equilíbrio ofensivo/defensivo)
+- Cobertura de papéis (sweeper, tank, suporte, etc.)
+- Sinergias entre membros do time
+- Fraquezas comuns e como abordá-las
+- Viabilidade competitiva
+
+Fale como o Professor Carvalho falaria - conhecedor, encorajador e perspicaz. Foque tanto nos pontos fortes quanto nas áreas para melhoria. Use apenas texto simples sem formatação especial.`
+      : `You are Professor Oak, the renowned Pokémon researcher. Analyze this Pokémon team with your expertise and provide strategic insights in your characteristic warm, knowledgeable style.
+
+IMPORTANT: DO NOT use double asterisks (**) for formatting. Use only plain text without special formatting.
 
 Team "${team.name}":
 ${teamInfo}
@@ -141,10 +190,12 @@ Consider these aspects:
 - Common weaknesses and how to address them
 - Competitive viability
 
-Speak as Professor Oak would - knowledgeable, encouraging, and insightful. Focus on both strengths and areas for improvement.`;
+Speak as Professor Oak would - knowledgeable, encouraging, and insightful. Focus on both strengths and areas for improvement. Use only plain text without special formatting.`;
+
+    return basePrompt;
   }
 
-  private createBattleStrategyPrompt(playerTeam: PokemonTeam, opponentTeam: PokemonTeam): string {
+  private createBattleStrategyPrompt(playerTeam: PokemonTeam, opponentTeam: PokemonTeam, language: Language = 'en'): string {
     const playerInfo = playerTeam.pokemon.map(tp => {
       const pokemon = tp.pokemon;
       const types = pokemon.types.map(t => t.type.name).join('/');
@@ -157,7 +208,27 @@ Speak as Professor Oak would - knowledgeable, encouraging, and insightful. Focus
       return `${pokemon.name} (${types})`;
     }).join(', ');
 
-    return `Professor Oak here! You're about to face a challenging battle. Let me give you some strategic advice.
+    const isPortuguese = language === 'pt-BR';
+
+    return isPortuguese 
+      ? `Professor Carvalho aqui! Você está prestes a enfrentar uma batalha desafiadora. Deixe-me dar alguns conselhos estratégicos.
+
+IMPORTANTE: NÃO use asteriscos duplos para formatação. Use apenas texto simples.
+
+Seu time: ${playerInfo}
+Time do oponente: ${opponentInfo}
+
+Como seu conselheiro de confiança, vou fornecer recomendações de estratégia de batalha. Considere:
+- Vantagens e desvantagens de tipos
+- Com qual Pokémon começar
+- Ameaças potenciais para ficar atento
+- Estratégias de troca
+- Movimentos e habilidades chave para utilizar
+
+Por favor, forneça conselhos de batalha específicos e práticos no tom encorajador e sábio do Professor Carvalho. Mantenha conciso mas perspicaz, focando nos pontos estratégicos mais importantes para esta batalha. Use apenas texto simples sem formatação especial.`
+      : `Professor Oak here! You're about to face a challenging battle. Let me give you some strategic advice.
+
+IMPORTANT: DO NOT use double asterisks for formatting. Use only plain text.
 
 Your team: ${playerInfo}
 Opponent's team: ${opponentInfo}
@@ -169,19 +240,43 @@ As your trusted advisor, I'll provide you with battle strategy recommendations. 
 - Switching strategies
 - Key moves and abilities to utilize
 
-Please provide specific, actionable battle advice in Professor Oak's encouraging and wise tone. Keep it concise but insightful, focusing on the most important strategic points for this matchup.`;
+Please provide specific, actionable battle advice in Professor Oak's encouraging and wise tone. Keep it concise but insightful, focusing on the most important strategic points for this matchup. Use only plain text without special formatting.`;
   }
 
-  private createTeamSuggestionPrompt(currentTeam: PokemonTeam, targetRole?: string): string {
+  private createTeamSuggestionPrompt(currentTeam: PokemonTeam, targetRole?: string, language: Language = 'en'): string {
     const teamInfo = currentTeam.pokemon.map(tp => {
       const pokemon = tp.pokemon;
       const types = pokemon.types.map(t => t.type.name).join('/');
       return `${pokemon.name} (${types})`;
     }).join(', ');
 
-    const roleText = targetRole ? `specifically for the ${targetRole} role` : 'to improve overall team balance';
+    const isPortuguese = language === 'pt-BR';
+    const roleText = targetRole 
+      ? (isPortuguese ? `especificamente para o papel de ${targetRole}` : `specifically for the ${targetRole} role`)
+      : (isPortuguese ? 'para melhorar o equilíbrio geral do time' : 'to improve overall team balance');
 
-    return `Professor Oak here! I see you have a team with: ${teamInfo}
+    return isPortuguese 
+      ? `Professor Carvalho aqui! Vejo que você tem um time com: ${teamInfo}
+
+IMPORTANTE: NÃO use asteriscos duplos para formatação. Use apenas texto simples.
+
+Preciso sugerir alguns Pokémon ${roleText}. Baseado na composição atual do seu time, quais Pokémon complementariam bem este time?
+
+Por favor, sugira 5-8 nomes específicos de Pokémon que funcionariam bem com este time. Considere:
+- Lacunas na cobertura de tipos
+- Equilíbrio de papéis (ofensivo, defensivo, suporte)
+- Sinergias com membros existentes do time
+- Viabilidade competitiva
+
+Responda apenas com os nomes dos Pokémon, um por linha, sem explicação adicional. Por exemplo:
+Garchomp
+Rotom-Wash
+Ferrothorn
+Clefable
+Landorus-Therian`
+      : `Professor Oak here! I see you have a team with: ${teamInfo}
+
+IMPORTANT: DO NOT use double asterisks for formatting. Use only plain text.
 
 I need to suggest some Pokémon ${roleText}. Based on your current team composition, what Pokémon would complement this team well?
 
@@ -274,13 +369,29 @@ Landorus-Therian`;
     return suggestions.slice(0, 8); // Limit to 8 suggestions
   }
 
-  async suggestTeamImprovements(teamData: PokemonTeam): Promise<TeamImprovementSuggestion> {
+  async suggestTeamImprovements(teamData: PokemonTeam, language: Language = 'en'): Promise<TeamImprovementSuggestion> {
     if (!this.model) {
       throw new Error('Gemini AI is not available. Please check your API key configuration.');
     }
 
     try {
-      const prompt = `As Professor Oak, suggest improvements for this Pokémon team.
+      const isPortuguese = language === 'pt-BR';
+      const prompt = isPortuguese 
+        ? `Como Professor Carvalho, sugira melhorias para este time Pokémon.
+
+IMPORTANTE: NÃO use asteriscos duplos para formatação. Use apenas texto simples.
+
+Dados do Time: ${JSON.stringify(teamData, null, 2)}
+
+Forneça sugestões em formato JSON:
+{
+  "replacements": [{"current": "Nome do Pokémon", "suggested": "Pokémon melhor", "reason": "Por que este é melhor"}],
+  "moveChanges": [{"pokemon": "Nome do Pokémon", "move": "Movimento atual", "suggested": "Movimento melhor", "reason": "Por quê"}],
+  "generalTips": ["Dica1", "Dica2", ...]
+}`
+        : `As Professor Oak, suggest improvements for this Pokémon team.
+
+IMPORTANT: DO NOT use double asterisks for formatting. Use only plain text.
 
 Team Data: ${JSON.stringify(teamData, null, 2)}
 
@@ -293,7 +404,7 @@ Provide suggestions in JSON format:
 
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
-      const text = response.text();
+      const text = this.cleanTextFormatting(response.text());
       
       return this.parseResponse(text);
     } catch (error) {
