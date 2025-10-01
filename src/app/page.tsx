@@ -149,7 +149,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Search className="w-6 h-6 text-blue-500" />
@@ -174,7 +174,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Users className="w-6 h-6 text-green-500" />
@@ -199,7 +199,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Brain className="w-6 h-6 text-purple-500" />
@@ -224,7 +224,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-2xl drop-shadow-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Swords className="w-6 h-6 text-red-500" />

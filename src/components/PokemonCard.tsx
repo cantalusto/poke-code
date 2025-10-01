@@ -86,7 +86,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
       onHoverEnd={() => setIsHovered(false)}
     >
       <Card 
-        className="overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl"
+        className="overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl drop-shadow-lg"
         style={{ 
           borderColor: isHovered ? typeColor : 'transparent',
           background: `linear-gradient(135deg, ${typeColor}15 0%, transparent 50%)`

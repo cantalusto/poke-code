@@ -45,7 +45,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.99 0.005 60); /* Almost pure white background */
+  --background: oklch(0.97 0.01 85); /* Fundo bege muito claro e suavizado */
   --foreground: oklch(0.1 0.05 220); /* Very dark blue text for maximum contrast */
   --card: oklch(1 0 0); /* Pure white for cards */
   --card-foreground: oklch(0.1 0.05 220); /* Very dark blue text */
