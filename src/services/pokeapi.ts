@@ -312,7 +312,7 @@ class PokeAPIService {
       fairy: '#EE99AC',
     };
 
-    return typeColors[typeName] || '#68A090';
+    return typeColors[typeName] || '#68A090'; // Default color
   }
 
   // Clear cache method for testing or manual refresh

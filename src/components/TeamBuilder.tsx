@@ -302,15 +302,15 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                     animate={{ opacity: 1, y: 0 }}
                     className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                       selectedTeam?.id === team.id
-                        ? 'bg-blue-50 border-blue-200'
-                        : 'hover:bg-gray-50'
+                        ? 'bg-blue-50/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'
+                        : 'hover:bg-muted'
                     }`}
                     onClick={() => setSelectedTeam(team)}
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">{team.name}</h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {team.pokemon.length}/6 {t('pokemon')}
                         </p>
                       </div>
@@ -429,10 +429,10 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                           key={`empty-slot-${selectedTeam.pokemon.length}-${index}`}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
+                          className="aspect-square border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
                           onClick={() => setShowPokemonSelector(true)}
                         >
-                          <Plus className="w-8 h-8 text-gray-400" />
+                          <Plus className="w-8 h-8 text-muted-foreground" />
                         </motion.div>
                       ))}
                     </div>

@@ -188,8 +188,8 @@ export function BattleArena({ className }: BattleArenaProps) {
             className="w-32 h-32 object-contain"
           />
         ) : (
-          <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500 text-sm">{pokemon.nickname}</span>
+          <div className="w-32 h-32 bg-muted rounded-lg flex items-center justify-center">
+            <span className="text-muted-foreground text-sm">{pokemon.nickname}</span>
           </div>
         )}
         
@@ -246,8 +246,8 @@ export function BattleArena({ className }: BattleArenaProps) {
                 whileTap={{ scale: 0.98 }}
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                   selectedTrainer?.id === trainer.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 dark:border-blue-400'
+                    : 'border-border hover:bg-muted'
                 }`}
                 onClick={() => setSelectedTrainer(trainer)}
               >
@@ -260,7 +260,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                         alt={t(trainer.name)}
                         width={64}
                         height={64}
-                        className="w-16 h-16 object-contain rounded-lg border border-gray-200"
+                        className="w-16 h-16 object-contain rounded-lg border border-border"
                         onError={(e) => {
                           // Hide image if it fails to load
                           e.currentTarget.style.display = 'none';
@@ -281,7 +281,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                           trainer.difficulty === 'legendary' ? 'destructive' : 'default'
                         }
                         className={
-                          trainer.difficulty === 'easy' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
+                          trainer.difficulty === 'easy' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800' :
                           trainer.difficulty === 'hard' ? 'bg-red-900 text-red-100 hover:bg-red-800' :
                           ''
                         }
@@ -289,8 +289,8 @@ export function BattleArena({ className }: BattleArenaProps) {
                         {t(trainer.difficulty)}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{t(trainer.description || '')}</p>
-                    <Button variant="outline" size="sm" onClick={(e) => {
+                    <p className="text-sm text-muted-foreground mb-2">{t(trainer.description || '')}</p>
+                    <Button variant="outline" size="sm" className="hover:bg-muted hover:text-foreground transition-colors" onClick={(e) => {
                       e.stopPropagation();
                       setViewingTrainer(trainer);
                       setShowOpponentTeam(true);
@@ -440,7 +440,10 @@ export function BattleArena({ className }: BattleArenaProps) {
                             {opponentPokemon.pokemon.types.map((type) => (
                   <Badge
                     key={`opponent-${type.type.name}`}
-                    className={`${getMoveTypeColor(type.type.name)} text-white text-xs`}
+                    className="text-white text-xs border-0"
+                    style={{
+                      backgroundColor: pokeApiService.getTypeColor(type.type.name),
+                    }}
                   >
                     {t(type.type.name)}
                   </Badge>
@@ -454,7 +457,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                           </div>
                           <Progress
                             value={getHpPercentage(opponentPokemon)}
-                            className="h-2"
+                            className="h-2 bg-gray-200 [&>div]:bg-green-500"
                           />
                         </div>
                       </div>
@@ -504,7 +507,10 @@ export function BattleArena({ className }: BattleArenaProps) {
                             {playerPokemon.pokemon.types.map((type) => (
                   <Badge
                     key={`player-${type.type.name}`}
-                    className={`${getMoveTypeColor(type.type.name)} text-white text-xs`}
+                    className="text-white text-xs border-0"
+                    style={{
+                      backgroundColor: pokeApiService.getTypeColor(type.type.name),
+                    }}
                   >
                     {t(type.type.name)}
                   </Badge>
@@ -512,7 +518,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                           </div>
                           <div>
                             <h3 className="font-medium">{playerPokemon.nickname}</h3>
-                            <p className="text-sm text-gray-500">Lv. {playerPokemon.level}</p>
+                            <p className="text-sm text-muted-foreground">Lv. {playerPokemon.level}</p>
                           </div>
                         </div>
                         <div className="w-48">
@@ -522,7 +528,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                           </div>
                           <Progress
                             value={getHpPercentage(playerPokemon)}
-                            className="h-2"
+                            className="h-2 bg-muted [&>div]:bg-green-500"
                           />
                         </div>
                       </div>
@@ -545,18 +551,20 @@ export function BattleArena({ className }: BattleArenaProps) {
                       <Button
                         key={`player-move-${move.name}-${index}`}
                         variant="outline"
-                        className="h-auto p-4 text-left"
+                        className="h-auto p-4 text-left hover:bg-black hover:text-white hover:border-black hover:shadow-lg transition-all duration-200"
                         disabled={isAnimating}
                         onClick={() => executeAction({ type: 'attack', moveIndex: move.name })}
                       >
                         <div className="w-full">
                           <div className="flex items-center justify-between mb-1">
                             <span className="font-medium">{move.name}</span>
-                            <Badge className={`${getMoveTypeColor(move.type)} text-white text-xs`}>
+                            <Badge className="text-white text-xs border-0" style={{
+                              backgroundColor: pokeApiService.getTypeColor(move.type),
+                            }}>
                               {move.type}
                             </Badge>
                           </div>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div className="flex items-center justify-between text-sm text-muted-foreground">
                             <span>{t('power')}: {move.power || '—'}</span>
                             <span>{t('pp')}: {move.pp}/{move.maxPp}</span>
                           </div>
@@ -587,12 +595,21 @@ export function BattleArena({ className }: BattleArenaProps) {
                                 <Button
                                   key={`switch-${pokemon.pokemon.id}-${index}`}
                                   variant="outline"
-                                  className="h-auto p-4"
+                                  className="h-auto p-4 flex flex-col items-center space-y-2 hover:bg-muted hover:text-foreground transition-colors"
                                   onClick={() => executeAction({ type: 'switch', pokemonIndex: index })}
                                 >
+                                  <div className="w-16 h-16 relative">
+                                    <Image
+                                      src={pokemon.pokemon.sprites.front_default || '/placeholder-pokemon.png'}
+                                      alt={pokemon.nickname}
+                                      width={64}
+                                      height={64}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  </div>
                                   <div className="text-center">
                                     <div className="font-medium">{pokemon.nickname}</div>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm text-muted-foreground">
                                       {t('hp')}: {pokemon.currentHp}/{pokemon.maxHp}
                                     </div>
                                   </div>
@@ -659,12 +676,12 @@ export function BattleArena({ className }: BattleArenaProps) {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         className={`p-2 rounded ${
-                          entry.type === 'battle-start' ? 'bg-blue-100' :
-                          entry.type === 'battle-end' ? 'bg-purple-100' :
-                          entry.type === 'super-effective' ? 'bg-green-100' :
-                          entry.type === 'not-very-effective' ? 'bg-yellow-100' :
-                          entry.type === 'pokemon-fainted' ? 'bg-red-100' :
-                          'bg-gray-50'
+                          entry.type === 'battle-start' ? 'bg-blue-100/50 dark:bg-blue-900/20' :
+                          entry.type === 'battle-end' ? 'bg-purple-100/50 dark:bg-purple-900/20' :
+                          entry.type === 'super-effective' ? 'bg-green-100/50 dark:bg-green-900/20' :
+                          entry.type === 'not-very-effective' ? 'bg-yellow-100/50 dark:bg-yellow-900/20' :
+                          entry.type === 'pokemon-fainted' ? 'bg-red-100/50 dark:bg-red-900/20' :
+                          'bg-muted/50'
                         }`}
                       >
                         {entry.message}

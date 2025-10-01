@@ -155,11 +155,11 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
 
           {/* Team Preview */}
           {selectedTeam && (
-            <div className="border rounded-lg p-4 bg-gray-50">
+            <div className="border rounded-lg p-4 bg-muted">
               <h3 className="font-medium mb-2">{selectedTeam.name}</h3>
               <div className="flex flex-wrap gap-2">
                 {selectedTeam.pokemon.map((tp, index) => (
-                  <div key={`team-pokemon-${tp.pokemon.id}-${index}`} className="flex items-center gap-2 bg-white rounded px-2 py-1 text-sm">
+                  <div key={`team-pokemon-${tp.pokemon.id}-${index}`} className="flex items-center gap-2 bg-background rounded px-2 py-1 text-sm">
                     <span className="font-medium">{tp.pokemon.name}</span>
                     <div className="flex gap-1">
                       {tp.pokemon.types.map((type, typeIndex) => (
@@ -227,10 +227,10 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
             className="space-y-6"
           >
             {/* Professor's Comment */}
-            <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+            <Card className="border-purple-200 bg-gradient-to-r from-purple-50/20 to-blue-50/20 dark:from-purple-900/20 dark:to-blue-900/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center">
                     👨‍🔬
                   </div>
                   {t('professor_oak_analysis')}
@@ -239,7 +239,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
               <CardContent>
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
-                    <p className="text-lg italic text-gray-700 leading-relaxed">
+                    <p className="text-lg italic text-muted-foreground leading-relaxed">
                       &ldquo;{analysis.synergy.explanation}&rdquo;
                     </p>
                   </div>
@@ -323,7 +323,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                     <h4 className="font-medium text-green-600 mb-2">{t('current_roles')}</h4>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(analysis.roleAnalysis.roles).map(([role, pokemon], index) => (
-                        <Badge key={`role-${role}-${index}`} variant="secondary" className="bg-green-100 text-green-800">
+                        <Badge key={`role-${role}-${index}`} variant="secondary" className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                           {role}: {pokemon.join(', ')}
                         </Badge>
                       ))}
@@ -335,7 +335,7 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                       <h4 className="font-medium text-orange-600 mb-2">{t('missing_roles')}</h4>
                       <div className="flex flex-wrap gap-2">
                         {analysis.roleAnalysis.missingRoles.map((role, index) => (
-                          <Badge key={`missing-role-${role}-${index}`} variant="outline" className="border-orange-300 text-orange-700">
+                          <Badge key={`missing-role-${role}-${index}`} variant="outline" className="border-orange-300 dark:border-orange-600 text-orange-700 dark:text-orange-300">
                             {role}
                           </Badge>
                         ))}
@@ -414,14 +414,14 @@ export function AITeamAnalyzer({ className }: AITeamAnalyzerProps) {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg"
+                      className="flex items-start gap-3 p-3 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg"
                     >
                       <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <span className="text-sm font-medium text-blue-900">
+                        <span className="text-sm font-medium text-blue-900 dark:text-blue-200">
                           {t('suggestion')} {index + 1}:
                         </span>
-                        <p className="text-sm text-blue-800 mt-1">{suggestion}</p>
+                        <p className="text-sm text-blue-800 dark:text-blue-300 mt-1">{suggestion}</p>
                       </div>
                     </motion.div>
                   ))}

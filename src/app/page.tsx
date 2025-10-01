@@ -19,6 +19,7 @@ import { TeamBuilder } from '@/components/TeamBuilder';
 import { AITeamAnalyzer } from '@/components/AITeamAnalyzer';
 import { BattleArena } from '@/components/BattleArena';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Home() {
@@ -32,9 +33,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-background/80 backdrop-blur-sm border-b border-border sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <motion.div 
@@ -100,35 +101,38 @@ export default function Home() {
                 <Heart className="w-4 h-4 text-red-500" />
                 {t('made_with_love')}
               </div>
-              <LanguageToggle />
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <LanguageToggle />
+              </div>
             </motion.div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <main className="container mx-auto py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           {/* Navigation Tabs */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4 bg-white/80 backdrop-blur-sm">
-              <TabsTrigger value="pokedex" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4 bg-muted/50 backdrop-blur-sm border border-border mx-auto">
+              <TabsTrigger value="pokedex" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted hover:text-foreground transition-colors">
                 <Search className="w-4 h-4" />
                 {t('pokedex')}
               </TabsTrigger>
-              <TabsTrigger value="team-builder" className="flex items-center gap-2">
+              <TabsTrigger value="team-builder" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted hover:text-foreground transition-colors">
                 <Users className="w-4 h-4" />
                 {t('team_builder')}
               </TabsTrigger>
-              <TabsTrigger value="ai-analyzer" className="flex items-center gap-2">
+              <TabsTrigger value="ai-analyzer" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted hover:text-foreground transition-colors">
                 <Brain className="w-4 h-4" />
                 {t('ai_analyzer')}
               </TabsTrigger>
-              <TabsTrigger value="battle" className="flex items-center gap-2">
+              <TabsTrigger value="battle" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted hover:text-foreground transition-colors">
                 <Swords className="w-4 h-4" />
                 {t('battle_arena')}
               </TabsTrigger>
@@ -136,7 +140,7 @@ export default function Home() {
           </motion.div>
 
           {/* Tab Contents */}
-          <TabsContent value="pokedex" className="mt-6">
+          <TabsContent value="pokedex" className="mt-4 px-4">
             <motion.div
               key="pokedex"
               variants={tabVariants}
@@ -145,7 +149,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Search className="w-6 h-6 text-blue-500" />
@@ -161,7 +165,7 @@ export default function Home() {
             </motion.div>
           </TabsContent>
 
-          <TabsContent value="team-builder" className="mt-6">
+          <TabsContent value="team-builder" className="mt-4 px-4">
             <motion.div
               key="team-builder"
               variants={tabVariants}
@@ -170,7 +174,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Users className="w-6 h-6 text-green-500" />
@@ -186,7 +190,7 @@ export default function Home() {
             </motion.div>
           </TabsContent>
 
-          <TabsContent value="ai-analyzer" className="mt-6">
+          <TabsContent value="ai-analyzer" className="mt-4 px-4">
             <motion.div
               key="ai-analyzer"
               variants={tabVariants}
@@ -195,7 +199,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Brain className="w-6 h-6 text-purple-500" />
@@ -211,7 +215,7 @@ export default function Home() {
             </motion.div>
           </TabsContent>
 
-          <TabsContent value="battle" className="mt-6">
+          <TabsContent value="battle" className="mt-4 px-4">
             <motion.div
               key="battle"
               variants={tabVariants}
@@ -220,7 +224,7 @@ export default function Home() {
               exit="exit"
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-background/80 backdrop-blur-sm border-0 shadow-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-6">
                     <Swords className="w-6 h-6 text-red-500" />
@@ -244,28 +248,28 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-blue-500 to-purple-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Search className="w-8 h-8 mx-auto mb-2" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('discover_pokemon')}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-green-500 to-teal-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Users className="w-8 h-8 mx-auto mb-2" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('build_your_team')}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-purple-500 to-pink-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Brain className="w-8 h-8 mx-auto mb-2" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('analyze_with_ai')}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-red-500 to-orange-600 text-white border-0">
             <CardContent className="p-4 text-center">
               <Swords className="w-8 h-8 mx-auto mb-2" />
               <p className="text-lg font-bold opacity-100 animate-pulse">{t('battle_with_team')}</p>
@@ -275,7 +279,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-16">
+      <footer className="bg-background/80 backdrop-blur-sm border-t border-border mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
