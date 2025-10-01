@@ -157,7 +157,7 @@ export default function Home() {
                 <CardContent className="p-3 sm:p-6">
                   <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Search className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                    <h2 className="text-lg sm:text-xl font-bold text-black">{t('pokedex_explorer')}</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-foreground">{t('pokedex_explorer')}</h2>
                     <div className="ml-auto hidden sm:flex items-center gap-2 text-sm text-gray-500">
                       <Shield className="w-4 h-4" />
                       {t('discover_and_explore')}
@@ -182,7 +182,7 @@ export default function Home() {
                 <CardContent className="p-3 sm:p-6">
                   <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Users className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                    <h2 className="text-lg sm:text-xl font-bold text-black">{t('team_builder')}</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-foreground">{t('team_builder')}</h2>
                     <div className="ml-auto hidden sm:flex items-center gap-2 text-sm text-gray-500">
                       <Shield className="w-4 h-4" />
                       {t('build_your_team')}
@@ -207,7 +207,7 @@ export default function Home() {
                 <CardContent className="p-3 sm:p-6">
                   <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                    <h2 className="text-lg sm:text-xl font-bold text-black">{t('ai_analyzer')}</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-foreground">{t('ai_analyzer')}</h2>
                     <div className="ml-auto hidden sm:flex items-center gap-2 text-sm text-gray-500">
                       <Sparkles className="w-4 h-4 text-yellow-500" />
                       {t('analyze_with_ai')}
@@ -232,7 +232,7 @@ export default function Home() {
                 <CardContent className="p-3 sm:p-6">
                   <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Swords className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                    <h2 className="text-lg sm:text-xl font-bold text-black">{t('battle_arena')}</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-foreground">{t('battle_arena')}</h2>
                     <div className="ml-auto hidden sm:flex items-center gap-2 text-sm text-gray-500">
                       <Zap className="w-4 h-4 text-yellow-500" />
                       {t('battle_with_team')}
