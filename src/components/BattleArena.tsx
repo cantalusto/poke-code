@@ -189,7 +189,7 @@ export function BattleArena({ className }: BattleArenaProps) {
           />
         ) : (
           <div className="w-32 h-32 bg-muted rounded-lg flex items-center justify-center">
-            <span className="text-muted-foreground text-sm">{pokemon.nickname}</span>
+            <span className="text-muted-foreground text-sm">{pokemon.nickname || pokemon.pokemon.name}</span>
           </div>
         )}
         
@@ -433,7 +433,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                       <div className="space-y-2">
                         <div className="flex items-center justify-end gap-2">
                           <div>
-                            <h3 className="font-medium">{opponentPokemon.nickname}</h3>
+                            <h3 className="font-medium">{opponentPokemon.nickname || opponentPokemon.pokemon.name}</h3>
                             <p className="text-sm text-gray-500">Lv. {opponentPokemon.level}</p>
                           </div>
                           <div className="flex gap-1">
@@ -517,7 +517,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                 ))}
                           </div>
                           <div>
-                            <h3 className="font-medium">{playerPokemon.nickname}</h3>
+                            <h3 className="font-medium">{playerPokemon.nickname || playerPokemon.pokemon.name}</h3>
                             <p className="text-sm text-muted-foreground">Lv. {playerPokemon.level}</p>
                           </div>
                         </div>
@@ -564,7 +564,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                               {move.type}
                             </Badge>
                           </div>
-                          <div className="flex items-center justify-between text-sm text-muted-foreground">
+                          <div className="flex items-center justify-between text-sm hover:text-white">
                             <span>{t('power')}: {move.power || '—'}</span>
                             <span>{t('pp')}: {move.pp}/{move.maxPp}</span>
                           </div>
@@ -576,7 +576,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                     {battleState.playerTeam.filter(p => !p.fainted && p !== playerPokemon).length > 0 && (
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="secondary" className="h-auto p-4" disabled={isAnimating}>
+                          <Button variant="secondary" className="h-auto p-4 bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700" disabled={isAnimating}>
                             <div className="w-full text-center">
                               <RotateCcw className="w-5 h-5 mx-auto mb-1" />
                               <span>{t('switch_pokemon')}</span>
@@ -601,14 +601,14 @@ export function BattleArena({ className }: BattleArenaProps) {
                                   <div className="w-16 h-16 relative">
                                     <Image
                                       src={pokemon.pokemon.sprites.front_default || '/placeholder-pokemon.png'}
-                                      alt={pokemon.nickname}
+                                      alt={pokemon.nickname || pokemon.pokemon.name}
                                       width={64}
                                       height={64}
                                       className="w-full h-full object-contain"
                                     />
                                   </div>
                                   <div className="text-center">
-                                    <div className="font-medium">{pokemon.nickname}</div>
+                                    <div className="font-medium">{pokemon.nickname || pokemon.pokemon.name}</div>
                                     <div className="text-sm text-muted-foreground">
                                       {t('hp')}: {pokemon.currentHp}/{pokemon.maxHp}
                                     </div>
