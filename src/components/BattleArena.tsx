@@ -238,7 +238,7 @@ export function BattleArena({ className }: BattleArenaProps) {
         {/* Trainer Selection */}
         <div>
           <label className="block text-sm font-medium mb-2">{t('select_opponent')}</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {AI_TRAINERS.map((trainer) => (
               <motion.div
                 key={trainer.id}
@@ -310,7 +310,7 @@ export function BattleArena({ className }: BattleArenaProps) {
             <DialogHeader>
               <DialogTitle>{t('team_of')} {t(viewingTrainer?.name || '')}</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
               {viewingTrainer?.team?.map((pokemon, index) => {
                 // Função para obter o ID do Pokémon baseado no nome
                 const getPokemonId = (name: string): string => {
@@ -421,7 +421,7 @@ export function BattleArena({ className }: BattleArenaProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           {/* Battle Field */}
           <div className="lg:col-span-2">
             <Card>
@@ -545,13 +545,13 @@ export function BattleArena({ className }: BattleArenaProps) {
                   <CardTitle className="text-lg">{t('choose_your_action')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* Attack Moves */}
                     {playerPokemon && playerPokemon.moves.filter(m => m.pp > 0).map((move, index) => (
                       <Button
                         key={`player-move-${move.name}-${index}`}
                         variant="outline"
-                        className="h-auto p-4 text-left hover:bg-black hover:text-white hover:border-black hover:shadow-lg transition-all duration-200"
+                        className="h-auto p-4 text-left hover:bg-black hover:text-white hover:border-black transition-colors duration-200"
                         disabled={isAnimating}
                         onClick={() => executeAction({ type: 'attack', moveIndex: move.name })}
                       >
@@ -587,7 +587,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                           <DialogHeader>
                             <DialogTitle>{t('choose_pokemon_to_switch')}</DialogTitle>
                           </DialogHeader>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             {battleState.playerTeam
                               .map((pokemon, index) => ({ pokemon, index }))
                               .filter(({ pokemon }) => pokemon !== playerPokemon && !pokemon.fainted)

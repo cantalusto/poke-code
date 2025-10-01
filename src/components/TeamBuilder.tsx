@@ -269,7 +269,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Team Management */}
         <div className="lg:col-span-1">
           <Card>
@@ -378,7 +378,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                               </div>
                             )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                               {searchResults.map((pokemon) => (
                                 <motion.div
                                   key={`search-${pokemon.id}`}
@@ -397,7 +397,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                       <AnimatePresence>
                         {selectedTeam.pokemon.map((teamPokemon, index) => (
                           <motion.div
@@ -442,7 +442,7 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
 
               <TabsContent value="stats" className="space-y-4">
                 {teamStats && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {/* Average Stats */}
                     <Card>
                       <CardHeader>

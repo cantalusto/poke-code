@@ -86,7 +86,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
       onHoverEnd={() => setIsHovered(false)}
     >
       <Card 
-        className="overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl drop-shadow-lg"
+        className="overflow-hidden border-2 transition-all duration-300 shadow-sm hover:shadow-md"
         style={{ 
           borderColor: isHovered ? typeColor : 'transparent',
           background: `linear-gradient(135deg, ${typeColor}15 0%, transparent 50%)`
@@ -157,7 +157,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
               <span>{t('total')}: {totalStats}</span>
             </div>
             
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-1 sm:gap-2 text-xs">
               {Object.entries(stats).map(([statName, value], index) => (
                 <div key={`card-${pokemon.id}-stat-${statName}-${index}`} className="space-y-1">
                   <div className="flex justify-between">

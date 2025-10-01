@@ -219,7 +219,12 @@ const translations = {
     'gym_leader_brock': 'Gym Leader Brock',
     'gym_leader_brock_description': 'The Rock-type Gym Leader of Pewter City. A great trainer for beginners.',
     'rival_blue': 'Rival Blue',
-    'rival_blue_description': 'Your long-time rival. His team is well balanced and competitive.'
+    'rival_blue_description': 'Your long-time rival. His team is well balanced and competitive.',
+
+    // Orientation Guard
+    'rotate_device': 'Please rotate your device',
+    'landscape_required': 'This application works best in landscape mode',
+    'rotate_automatically': 'Rotate Automatically'
   },
   'pt-BR': {
     // Header
@@ -425,7 +430,12 @@ const translations = {
     'gym_leader_brock': 'Líder de Ginásio Brock',
     'gym_leader_brock_description': 'O Líder de Ginásio do tipo Pedra de Pewter City. Um ótimo treinador para iniciantes.',
     'rival_blue': 'Rival Blue',
-    'rival_blue_description': 'Seu rival de longa data. Sua equipe é bem equilibrada e competitiva.'
+    'rival_blue_description': 'Seu rival de longa data. Sua equipe é bem equilibrada e competitiva.',
+
+    // Orientation Guard
+    'rotate_device': 'Por favor, gire seu dispositivo',
+    'landscape_required': 'Esta aplicação funciona melhor no modo paisagem',
+    'rotate_automatically': 'Girar Automaticamente'
   }
 };
 

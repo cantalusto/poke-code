@@ -286,7 +286,7 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
       </div>
 
       {/* Search and Controls */}
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex-1 max-w-md">
@@ -381,23 +381,26 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
                       <Badge
                         key={`filter-${type}-${index}`}
                         variant={selectedTypes.includes(type) ? "default" : "outline"}
-                        className="cursor-pointer transition-colors"
+                        className="cursor-pointer transition-all duration-200 hover:scale-105 border-2"
                         style={{
                           backgroundColor: selectedTypes.includes(type) 
                             ? pokeApiService.getTypeColor(type) 
-                            : undefined,
-                          color: selectedTypes.includes(type) ? 'white' : undefined
+                            : `${pokeApiService.getTypeColor(type)}15`,
+                          borderColor: pokeApiService.getTypeColor(type),
+                          color: selectedTypes.includes(type) 
+                            ? 'white' 
+                            : pokeApiService.getTypeColor(type)
                         }}
                         onClick={() => handleTypeToggle(type)}
                       >
-                        {type}
+                        {t(type)}
                       </Badge>
                     ))}
                   </div>
                 </div>
 
                 {/* Generation Filter */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">{t('generation')}</label>
                     <Select value={selectedGeneration} onValueChange={setSelectedGeneration}>
