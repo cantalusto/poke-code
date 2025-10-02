@@ -465,7 +465,13 @@ const translations = {
     'sp_attack': 'At. Especial',
     'sp_defense': 'Def. Especial',
     'accuracy': 'Precisão',
-    'click_move_details': 'Clique no movimento para detalhes'
+    'click_move_details': 'Clique no movimento para detalhes',
+
+    // Success messages for moves and level updates
+    'moves_updated': 'Movimentos Atualizados',
+    'pokemon_moves_updated_successfully': 'Movimentos do Pokémon atualizados com sucesso',
+    'level_updated': 'Nível Atualizado',
+    'pokemon_level_updated_to': 'Nível do Pokémon atualizado para'
   }
 };
 
