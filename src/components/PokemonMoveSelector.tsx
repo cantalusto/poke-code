@@ -1,21 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Loader2, Zap, Shield, Heart, Info } from 'lucide-react';
-import { Pokemon, TeamPokemonMove, MoveDetails } from '@/types/pokemon';
+import { Loader2, Zap, Shield, Sword } from 'lucide-react';
+import { Pokemon, MoveDetails, TeamPokemonMove } from '@/types/pokemon';
 import { pokeApiService } from '@/services/pokeapi';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PokemonMoveSelectorProps {
   pokemon: Pokemon;
-  currentMoves: TeamPokemonMove[];
   selectedMoves: string[];
   onMovesChange: (moves: string[]) => void;
   isOpen: boolean;
@@ -24,7 +22,6 @@ interface PokemonMoveSelectorProps {
 
 export function PokemonMoveSelector({
   pokemon,
-  currentMoves,
   selectedMoves,
   onMovesChange,
   isOpen,
@@ -37,17 +34,7 @@ export function PokemonMoveSelector({
   const [loadingDetails, setLoadingDetails] = useState<string[]>([]);
   const [tempSelectedMoves, setTempSelectedMoves] = useState<string[]>(selectedMoves);
 
-  useEffect(() => {
-    if (isOpen && pokemon) {
-      loadPokemonMoves();
-    }
-  }, [isOpen, pokemon]);
-
-  useEffect(() => {
-    setTempSelectedMoves(selectedMoves);
-  }, [selectedMoves]);
-
-  const loadPokemonMoves = async () => {
+  const loadPokemonMoves = useCallback(async () => {
     setLoading(true);
     try {
       const moves = await pokeApiService.getPokemonMoves(pokemon);
@@ -57,7 +44,17 @@ export function PokemonMoveSelector({
     } finally {
       setLoading(false);
     }
-  };
+  }, [pokemon]);
+
+  useEffect(() => {
+    if (isOpen && pokemon) {
+      loadPokemonMoves();
+    }
+  }, [isOpen, pokemon, loadPokemonMoves]);
+
+  useEffect(() => {
+    setTempSelectedMoves(selectedMoves);
+  }, [selectedMoves]);
 
   const loadMoveDetails = async (moveName: string) => {
     if (moveDetails[moveName] || loadingDetails.includes(moveName)) return;
@@ -122,23 +119,23 @@ export function PokemonMoveSelector({
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'physical':
-        return <Zap className="w-4 h-4" />;
+        return <Sword className="w-4 h-4" />;
       case 'special':
-        return <Heart className="w-4 h-4" />;
+        return <Zap className="w-4 h-4" />;
       case 'status':
         return <Shield className="w-4 h-4" />;
       default:
-        return <Info className="w-4 h-4" />;
+        return <Shield className="w-4 h-4" />;
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] sm:w-full">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
+          <DialogTitle className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 text-sm sm:text-base">
             <span>{t('select_moves_for')} {pokemon.name}</span>
-            <Badge variant="outline">
+            <Badge variant="outline" className="self-start sm:self-auto">
               {tempSelectedMoves.length}/4 {t('selected')}
             </Badge>
           </DialogTitle>
@@ -146,13 +143,13 @@ export function PokemonMoveSelector({
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin" />
-            <span className="ml-2">{t('loading_moves')}</span>
+            <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin" />
+            <span className="ml-2 text-sm sm:text-base">{t('loading_moves')}</span>
           </div>
         ) : (
           <div className="space-y-4">
-            <ScrollArea className="h-96">
-              <div className="grid gap-2">
+            <ScrollArea className="h-64 sm:h-80 md:h-96">
+              <div className="grid gap-2 pr-2">
                 {availableMoves.map((move) => {
                   const isSelected = tempSelectedMoves.includes(move.name);
                   const details = moveDetails[move.name];
@@ -164,7 +161,7 @@ export function PokemonMoveSelector({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className={`
-                        border rounded-lg p-3 cursor-pointer transition-all
+                        border rounded-lg p-2 sm:p-3 cursor-pointer transition-all
                         ${isSelected ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'}
                         hover:border-blue-300 dark:hover:border-blue-600
                       `}
@@ -174,54 +171,56 @@ export function PokemonMoveSelector({
                         }
                       }}
                     >
-                      <div className="flex items-center space-x-3">
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={(checked) => 
-                            handleMoveToggle(move.name, checked as boolean)
-                          }
-                          disabled={!isSelected && tempSelectedMoves.length >= 4}
-                        />
+                      <div className="flex items-start sm:items-center space-x-2 sm:space-x-3">
+                        <div className="mt-1 sm:mt-0">
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={(checked) => 
+                              handleMoveToggle(move.name, checked as boolean)
+                            }
+                            disabled={!isSelected && tempSelectedMoves.length >= 4}
+                          />
+                        </div>
                         
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2">
-                            <h4 className="font-medium capitalize">
+                            <h4 className="font-medium capitalize text-sm sm:text-base truncate">
                               {move.name.replace('-', ' ')}
                             </h4>
                             {isLoadingDetails && (
-                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin flex-shrink-0" />
                             )}
                           </div>
 
                           {details && (
                             <div className="mt-2 space-y-2">
-                              <div className="flex items-center space-x-2">
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                                 <Badge 
-                                  className={`${getTypeColor(details.type.name)} text-white`}
+                                  className={`${getTypeColor(details.type.name)} text-white text-xs`}
                                 >
                                   {details.type.name}
                                 </Badge>
-                                <Badge variant="outline" className="flex items-center space-x-1">
+                                <Badge variant="outline" className="flex items-center space-x-1 text-xs">
                                   {getCategoryIcon(details.damage_class.name)}
-                                  <span>{details.damage_class.name}</span>
+                                  <span className="hidden sm:inline">{details.damage_class.name}</span>
                                 </Badge>
                                 {details.power && (
-                                  <Badge variant="secondary">
+                                  <Badge variant="secondary" className="text-xs">
                                     {t('power')}: {details.power}
                                   </Badge>
                                 )}
                                 {details.accuracy && (
-                                  <Badge variant="secondary">
+                                  <Badge variant="secondary" className="text-xs">
                                     {t('accuracy')}: {details.accuracy}%
                                   </Badge>
                                 )}
-                                <Badge variant="secondary">
+                                <Badge variant="secondary" className="text-xs">
                                   PP: {details.pp}
                                 </Badge>
                               </div>
                               
                               {details.effect_entries.length > 0 && (
-                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                                   {details.effect_entries.find(entry => entry.language.name === 'en')?.short_effect || 
                                    details.effect_entries[0]?.short_effect}
                                 </p>
@@ -236,15 +235,15 @@ export function PokemonMoveSelector({
               </div>
             </ScrollArea>
 
-            <div className="flex justify-between items-center pt-4 border-t">
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-4 border-t space-y-2 sm:space-y-0">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 text-center sm:text-left">
                 {t('click_move_details')}
               </p>
-              <div className="space-x-2">
-                <Button variant="outline" onClick={handleCancel}>
+              <div className="flex space-x-2 justify-center sm:justify-end">
+                <Button variant="outline" onClick={handleCancel} size="sm" className="flex-1 sm:flex-none">
                   {t('cancel')}
                 </Button>
-                <Button onClick={handleSave}>
+                <Button onClick={handleSave} size="sm" className="flex-1 sm:flex-none">
                   {t('save_moves')}
                 </Button>
               </div>

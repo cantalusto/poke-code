@@ -388,13 +388,13 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                             {t('add_pokemon')}
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                        <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] sm:w-full overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle>{t('add_pokemon_to_team')}</DialogTitle>
+                            <DialogTitle className="text-sm sm:text-base">{t('add_pokemon_to_team')}</DialogTitle>
                           </DialogHeader>
                           
-                          <div className="space-y-4">
-                            <div className="flex gap-2">
+                          <div className="space-y-3 sm:space-y-4">
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <Input
                                 placeholder={t('search_pokemon')}
                                 value={searchQuery}
@@ -650,7 +650,6 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
       {selectedPokemonIndex !== null && selectedTeam && (
         <PokemonMoveSelector
           pokemon={selectedTeam.pokemon[selectedPokemonIndex].pokemon}
-          currentMoves={selectedTeam.pokemon[selectedPokemonIndex].moves}
           selectedMoves={selectedTeam.pokemon[selectedPokemonIndex].selectedMoves || []}
           onMovesChange={handleMovesChange}
           isOpen={showMoveSelector}

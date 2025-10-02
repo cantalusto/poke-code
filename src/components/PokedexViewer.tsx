@@ -80,19 +80,22 @@ export const PokedexViewer: React.FC<PokedexViewerProps> = ({
     
     try {
       // Get basic moves for the Pokemon
-      const basicMoves = ['tackle', 'quick-attack'];
+      const basicMoves = [
+        { name: 'tackle' },
+        { name: 'quick-attack' }
+      ];
       
       // Add type-specific move based on primary type
       const primaryType = pokemon.types[0]?.type.name;
       if (primaryType) {
         const typeMove = getTypeSpecificMove(primaryType);
         if (typeMove) {
-          basicMoves.push(typeMove);
+          basicMoves.push({ name: typeMove });
         }
       }
       
       // Add a fourth move
-      basicMoves.push('body-slam');
+      basicMoves.push({ name: 'body-slam' });
       
       const teamPokemon: TeamPokemon = {
         pokemon,

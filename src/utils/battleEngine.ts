@@ -127,7 +127,13 @@ export class BattleEngine {
       opponent = opponentTeam.team.map(aiPokemon => ({
         pokemon: { name: aiPokemon.name } as Pokemon, // Will be loaded later
         nickname: aiPokemon.name,
-        level: aiPokemon.level
+        level: aiPokemon.level,
+        moves: [
+          { name: 'tackle' },
+          { name: 'quick-attack' },
+          { name: 'body-slam' },
+          { name: 'double-edge' }
+        ]
       }));
     } else {
       opponent = opponentTeam;
@@ -184,7 +190,7 @@ export class BattleEngine {
     
     if (teamPokemon.moves && teamPokemon.moves.length > 0) {
       // Convert team moves to battle moves
-      moves = teamPokemon.moves.map(moveName => this.createBattleMoveFromName(moveName));
+      moves = teamPokemon.moves.map(move => this.createBattleMoveFromName(move.name));
     } else {
       // Fallback to default moves
       moves = [

@@ -26,7 +26,8 @@ import {
   AITrainer, 
   PokemonTeam, 
   BattlePokemon,
-  Pokemon
+  Pokemon,
+  TeamPokemon
 } from '@/types/pokemon';
 import { BattleEngine, AI_TRAINERS } from '@/utils/battleEngine';
 import { TeamStorageService } from '@/utils/teamStorage';
@@ -83,7 +84,13 @@ export function BattleArena({ className }: BattleArenaProps) {
             return {
               pokemon,
               nickname: pokemon.name,
-              level: aiPokemon.level
+              level: aiPokemon.level,
+              moves: [
+                { name: 'tackle' },
+                { name: 'quick-attack' },
+                { name: 'body-slam' },
+                { name: 'double-edge' }
+              ]
             };
           } catch (error) {
             console.error(`Failed to load ${aiPokemon.name}:`, error);
@@ -115,13 +122,30 @@ export function BattleArena({ className }: BattleArenaProps) {
                 ]
               } as unknown as Pokemon,
               nickname: aiPokemon.name,
-              level: aiPokemon.level
+              level: aiPokemon.level,
+              moves: [
+                { name: 'tackle' },
+                { name: 'quick-attack' },
+                { name: 'body-slam' },
+                { name: 'double-edge' }
+              ]
             };
           }
         })
       );
 
-      const initialState = battleEngine.initializeBattle(selectedTeam.pokemon, opponentTeamWithData);
+      // Ensure all team pokemon have moves property
+      const teamWithMoves: TeamPokemon[] = selectedTeam.pokemon.map(teamPokemon => ({
+        ...teamPokemon,
+        moves: teamPokemon.moves || [
+          { name: 'tackle' },
+          { name: 'quick-attack' },
+          { name: 'body-slam' },
+          { name: 'double-edge' }
+        ]
+      }));
+
+      const initialState = battleEngine.initializeBattle(teamWithMoves, opponentTeamWithData);
       setBattleState(initialState);
       setBattleLog(battleEngine.getBattleLog());
       
@@ -158,9 +182,7 @@ export function BattleArena({ className }: BattleArenaProps) {
     return (pokemon.currentHp / pokemon.maxHp) * 100;
   };
 
-  const getMoveTypeColor = (type: string): string => {
-    return pokeApiService.getTypeColor(type);
-  };
+
 
   const renderPokemonSprite = (pokemon: BattlePokemon, isPlayer: boolean) => {
     const spriteUrl = isPlayer 
@@ -277,7 +299,7 @@ export function BattleArena({ className }: BattleArenaProps) {
                         variant={
                           trainer.difficulty === 'easy' ? 'secondary' :
                           trainer.difficulty === 'medium' ? 'default' :
-                          trainer.difficulty === 'hard' ? 'destructive' : 
+                          trainer.difficulty === 'hard' ? 'destructive' :
                           trainer.difficulty === 'legendary' ? 'destructive' : 'default'
                         }
                         className={
@@ -306,11 +328,11 @@ export function BattleArena({ className }: BattleArenaProps) {
 
         {/* Global Opponent Team Modal */}
         <Dialog open={showOpponentTeam} onOpenChange={setShowOpponentTeam}>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] sm:w-full">
             <DialogHeader>
-              <DialogTitle>{t('team_of')} {t(viewingTrainer?.name || '')}</DialogTitle>
+              <DialogTitle className="text-sm sm:text-base">{t('team_of')} {t(viewingTrainer?.name || '')}</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4 p-2 sm:p-3 lg:p-4">
               {viewingTrainer?.team?.map((pokemon, index) => {
                 // Função para obter o ID do Pokémon baseado no nome
                 const getPokemonId = (name: string): string => {
