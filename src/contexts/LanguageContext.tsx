@@ -234,12 +234,19 @@ const translations = {
     'set_level_for': 'Set level for',
     'stats_at_level': 'Stats at level',
     'save_level': 'Save Level',
+    'pokemon_level': 'Pokémon Level',
     'attack': 'Attack',
     'defense': 'Defense',
     'sp_attack': 'Sp. Attack',
     'sp_defense': 'Sp. Defense',
     'accuracy': 'Accuracy',
-    'click_move_details': 'Click move for details'
+    'click_move_details': 'Click move for details',
+
+    // Success messages for moves and level updates
+    'moves_updated': 'Moves Updated',
+    'pokemon_moves_updated_successfully': 'Pokémon moves updated successfully',
+    'level_updated': 'Level Updated',
+    'pokemon_level_updated_to': 'Pokémon level updated to'
   },
   'pt-BR': {
     // Header
@@ -460,6 +467,7 @@ const translations = {
     'set_level_for': 'Definir nível para',
     'stats_at_level': 'Estatísticas no nível',
     'save_level': 'Salvar Nível',
+    'pokemon_level': 'Nível do Pokémon',
     'attack': 'Ataque',
     'defense': 'Defesa',
     'sp_attack': 'At. Especial',
