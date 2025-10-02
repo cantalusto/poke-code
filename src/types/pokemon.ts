@@ -114,7 +114,8 @@ export interface TeamPokemon {
   pokemon: Pokemon;
   nickname?: string;
   level: number;
-  moves?: string[];
+  moves: TeamPokemonMove[];
+  selectedMoves?: string[]; // Up to 4 selected moves for battle
 }
 
 export interface PokemonTeam {
@@ -292,3 +293,38 @@ export type PokemonTypeName =
 export type Generation = 
   | 'generation-i' | 'generation-ii' | 'generation-iii' | 'generation-iv' 
   | 'generation-v' | 'generation-vi' | 'generation-vii' | 'generation-viii' | 'generation-ix';
+
+
+export interface MoveDetails {
+  id: number;
+  name: string;
+  power: number | null;
+  accuracy: number | null;
+  pp: number;
+  type: {
+    name: string;
+    url: string;
+  };
+  damage_class: {
+    name: 'physical' | 'special' | 'status';
+    url: string;
+  };
+  effect_entries: Array<{
+    effect: string;
+    short_effect: string;
+    language: {
+      name: string;
+      url: string;
+    };
+  }>;
+  priority: number;
+  target: {
+    name: string;
+    url: string;
+  };
+}
+
+export interface TeamPokemonMove {
+  name: string;
+  details?: MoveDetails;
+}

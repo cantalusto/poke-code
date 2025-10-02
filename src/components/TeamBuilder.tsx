@@ -26,6 +26,9 @@ import { Pokemon, PokemonTeam, TeamPokemon, TeamStats } from '@/types/pokemon';
 import { TeamStorageService } from '@/utils/teamStorage';
 import { pokeApiService } from '@/services/pokeapi';
 import { PokemonCard } from './PokemonCard';
+import { PokemonMoveSelector } from './PokemonMoveSelector';
+import { PokemonLevelSelector } from './PokemonLevelSelector';
+import { useToast } from '@/components/ui/toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TeamBuilderProps {
@@ -34,6 +37,7 @@ interface TeamBuilderProps {
 
 export function TeamBuilder({ className }: TeamBuilderProps) {
   const { t } = useLanguage();
+  const { addToast } = useToast();
   const [teams, setTeams] = useState<PokemonTeam[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<PokemonTeam | null>(null);
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null);
@@ -42,6 +46,11 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
   const [searchResults, setSearchResults] = useState<Pokemon[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showPokemonSelector, setShowPokemonSelector] = useState(false);
+
+  // New state for move and level selectors
+  const [showMoveSelector, setShowMoveSelector] = useState(false);
+  const [showLevelSelector, setShowLevelSelector] = useState(false);
+  const [selectedPokemonIndex, setSelectedPokemonIndex] = useState<number | null>(null);
 
   // Load teams on component mount
   useEffect(() => {
@@ -103,26 +112,18 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
     if (!selectedTeam) return;
     
     try {
-      // Get basic moves for the Pokemon
-      const basicMoves = ['tackle', 'quick-attack'];
+      // Get available moves for the Pokemon
+      const availableMoves = await pokeApiService.getPokemonMoves(pokemon);
       
-      // Add type-specific move based on primary type
-      const primaryType = pokemon.types[0]?.type.name;
-      if (primaryType) {
-        const typeMove = getTypeSpecificMove(primaryType);
-        if (typeMove) {
-          basicMoves.push(typeMove);
-        }
-      }
-      
-      // Add a fourth move
-      basicMoves.push('body-slam');
+      // Select first 4 moves as default
+      const defaultMoves = availableMoves.slice(0, 4);
       
       const teamPokemon: TeamPokemon = {
         pokemon,
         nickname: pokemon.name,
         level: 50,
-        moves: basicMoves
+        moves: defaultMoves,
+        selectedMoves: defaultMoves.map(move => move.name)
       };
       
       const updatedTeam = TeamStorageService.addPokemonToTeam(selectedTeam, teamPokemon);
@@ -134,35 +135,69 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
       setShowPokemonSelector(false);
       setSearchQuery('');
       setSearchResults([]);
+      
+      // Show success toast instead of alert
+      addToast({
+        type: 'success',
+        title: t('pokemon_added'),
+        description: `${pokemon.name} ${t('added_to_team')} ${selectedTeam.name}!`
+      });
     } catch (error) {
       console.error('Error adding Pokémon to team:', error);
-      alert(error instanceof Error ? error.message : t('failed_add_pokemon_team'));
+      addToast({
+        type: 'error',
+        title: t('error'),
+        description: error instanceof Error ? error.message : t('failed_add_pokemon_team')
+      });
     }
   };
 
-  // Helper function to get type-specific moves
-  const getTypeSpecificMove = (type: string): string | null => {
-    const typeMoves: Record<string, string> = {
-      fire: 'ember',
-      water: 'water-gun',
-      grass: 'vine-whip',
-      electric: 'thunder-shock',
-      psychic: 'confusion',
-      ice: 'ice-beam',
-      dragon: 'dragon-rage',
-      dark: 'bite',
-      fighting: 'karate-chop',
-      poison: 'poison-sting',
-      ground: 'mud-slap',
-      flying: 'gust',
-      bug: 'bug-bite',
-      rock: 'rock-throw',
-      ghost: 'lick',
-      steel: 'metal-claw',
-      fairy: 'fairy-wind'
-    };
+  const handleEditMoves = (pokemonIndex: number) => {
+    setSelectedPokemonIndex(pokemonIndex);
+    setShowMoveSelector(true);
+  };
+
+  const handleEditLevel = (pokemonIndex: number) => {
+    setSelectedPokemonIndex(pokemonIndex);
+    setShowLevelSelector(true);
+  };
+
+  const handleMovesChange = (moves: string[]) => {
+    if (!selectedTeam || selectedPokemonIndex === null) return;
     
-    return typeMoves[type] || null;
+    const updatedTeam = { ...selectedTeam };
+    updatedTeam.pokemon[selectedPokemonIndex].selectedMoves = moves;
+    
+    TeamStorageService.saveTeam(updatedTeam);
+    setSelectedTeam(updatedTeam);
+    
+    const updatedTeams = TeamStorageService.getTeams();
+    setTeams(updatedTeams);
+    
+    addToast({
+      type: 'success',
+      title: t('moves_updated'),
+      description: t('pokemon_moves_updated_successfully')
+    });
+  };
+
+  const handleLevelChange = (level: number) => {
+    if (!selectedTeam || selectedPokemonIndex === null) return;
+    
+    const updatedTeam = { ...selectedTeam };
+    updatedTeam.pokemon[selectedPokemonIndex].level = level;
+    
+    TeamStorageService.saveTeam(updatedTeam);
+    setSelectedTeam(updatedTeam);
+    
+    const updatedTeams = TeamStorageService.getTeams();
+    setTeams(updatedTeams);
+    
+    addToast({
+      type: 'success',
+      title: t('level_updated'),
+      description: `${t('pokemon_level_updated_to')} ${level}!`
+    });
   };
 
   const removePokemonFromTeam = (index: number) => {
@@ -408,16 +443,48 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
                             className="relative group"
                           >
                             <PokemonCard pokemon={teamPokemon.pokemon} />
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => removePokemonFromTeam(index)}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                            <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                              Lv. {teamPokemon.level}
+                            
+                            {/* Action buttons */}
+                            <div className="absolute top-2 right-2 flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-auto"
+                                onClick={() => handleEditMoves(index)}
+                                title={t('edit_moves')}
+                              >
+                                <Zap className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-auto"
+                                onClick={() => handleEditLevel(index)}
+                                title={t('edit_level')}
+                              >
+                                <BarChart3 className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-auto"
+                                onClick={() => removePokemonFromTeam(index)}
+                                title={t('remove_pokemon')}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            
+                            {/* Level and moves info */}
+                            <div className="absolute bottom-2 left-2 space-y-1">
+                              <div className="bg-black/70 text-white px-2 py-1 rounded text-xs">
+                                Lv. {teamPokemon.level}
+                              </div>
+                              {teamPokemon.selectedMoves && teamPokemon.selectedMoves.length > 0 && (
+                                <div className="bg-blue-600/70 text-white px-2 py-1 rounded text-xs">
+                                  {teamPokemon.selectedMoves.length}/4 {t('moves')}
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         ))}
@@ -578,6 +645,35 @@ export function TeamBuilder({ className }: TeamBuilderProps) {
           )}
         </div>
       </div>
+
+      {/* Move Selector Dialog */}
+      {selectedPokemonIndex !== null && selectedTeam && (
+        <PokemonMoveSelector
+          pokemon={selectedTeam.pokemon[selectedPokemonIndex].pokemon}
+          currentMoves={selectedTeam.pokemon[selectedPokemonIndex].moves}
+          selectedMoves={selectedTeam.pokemon[selectedPokemonIndex].selectedMoves || []}
+          onMovesChange={handleMovesChange}
+          isOpen={showMoveSelector}
+          onClose={() => {
+            setShowMoveSelector(false);
+            setSelectedPokemonIndex(null);
+          }}
+        />
+      )}
+
+      {/* Level Selector Dialog */}
+      {selectedPokemonIndex !== null && selectedTeam && (
+        <PokemonLevelSelector
+          pokemon={selectedTeam.pokemon[selectedPokemonIndex].pokemon}
+          currentLevel={selectedTeam.pokemon[selectedPokemonIndex].level}
+          onLevelChange={handleLevelChange}
+          isOpen={showLevelSelector}
+          onClose={() => {
+            setShowLevelSelector(false);
+            setSelectedPokemonIndex(null);
+          }}
+        />
+      )}
     </div>
   );
 }

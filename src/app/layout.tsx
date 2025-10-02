@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ToastProvider } from "@/components/ui/toast";
 import { OrientationGuard } from "@/components/OrientationGuard";
 
 const geistSans = Geist({
@@ -32,9 +33,11 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <LanguageProvider>
-            <OrientationGuard>
-              {children}
-            </OrientationGuard>
+            <ToastProvider>
+              <OrientationGuard>
+                {children}
+              </OrientationGuard>
+            </ToastProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

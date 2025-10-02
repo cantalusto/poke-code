@@ -1,4 +1,4 @@
-import { Pokemon, PokemonListResponse, PokemonSpecies, SearchParams } from '@/types/pokemon';
+import { Pokemon, PokemonListResponse, PokemonSpecies, SearchParams, MoveDetails, TeamPokemonMove } from '@/types/pokemon';
 
 const BASE_URL = 'https://pokeapi.co/api/v2';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -318,6 +318,40 @@ class PokeAPIService {
   // Clear cache method for testing or manual refresh
   clearCache(): void {
     cache.clear();
+  }
+
+  async getMoveDetails(moveNameOrId: string | number): Promise<MoveDetails> {
+    const url = `${BASE_URL}/move/${moveNameOrId}`;
+    return this.fetchWithCache<MoveDetails>(url);
+  }
+
+  async getPokemonMoves(pokemon: Pokemon): Promise<TeamPokemonMove[]> {
+    // Get moves that can be learned by level up (not TM/HM/Tutor for simplicity)
+    const levelUpMoves = pokemon.moves.filter(move => 
+      move.version_group_details.some(detail => 
+        detail.move_learn_method.name === 'level-up' && 
+        detail.level_learned_at <= 100 // Reasonable level cap
+      )
+    );
+
+    // Sort by level learned and take first 20 moves to avoid too many API calls
+    const sortedMoves = levelUpMoves
+      .sort((a, b) => {
+        const aLevel = Math.min(...a.version_group_details
+          .filter(d => d.move_learn_method.name === 'level-up')
+          .map(d => d.level_learned_at));
+        const bLevel = Math.min(...b.version_group_details
+          .filter(d => d.move_learn_method.name === 'level-up')
+          .map(d => d.level_learned_at));
+        return aLevel - bLevel;
+      })
+      .slice(0, 20);
+
+    // Convert to TeamPokemonMove format
+    return sortedMoves.map(move => ({
+      name: move.move.name,
+      details: undefined // Will be loaded on demand
+    }));
   }
 }
 

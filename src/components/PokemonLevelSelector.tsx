@@ -1,0 +1,195 @@
+'use client';
+
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { TrendingUp, BarChart3 } from 'lucide-react';
+import { Pokemon } from '@/types/pokemon';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+interface PokemonLevelSelectorProps {
+  pokemon: Pokemon;
+  currentLevel: number;
+  onLevelChange: (level: number) => void;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function PokemonLevelSelector({
+  pokemon,
+  currentLevel,
+  onLevelChange,
+  isOpen,
+  onClose
+}: PokemonLevelSelectorProps) {
+  const { t } = useLanguage();
+  const [tempLevel, setTempLevel] = useState(currentLevel);
+
+  const handleSave = () => {
+    onLevelChange(tempLevel);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    setTempLevel(currentLevel);
+    onClose();
+  };
+
+  const calculateStatAtLevel = (baseStat: number, level: number) => {
+    // Simplified stat calculation (actual formula is more complex)
+    return Math.floor(((2 * baseStat * level) / 100) + level + 10);
+  };
+
+  const getStatName = (statName: string) => {
+    const statNames: Record<string, string> = {
+      'hp': 'HP',
+      'attack': t('attack'),
+      'defense': t('defense'),
+      'special-attack': t('sp_attack'),
+      'special-defense': t('sp_defense'),
+      'speed': t('speed')
+    };
+    return statNames[statName] || statName;
+  };
+
+  const getStatColor = (statName: string) => {
+    const colors: Record<string, string> = {
+      'hp': 'bg-red-500',
+      'attack': 'bg-orange-500',
+      'defense': 'bg-blue-500',
+      'special-attack': 'bg-purple-500',
+      'special-defense': 'bg-green-500',
+      'speed': 'bg-yellow-500'
+    };
+    return colors[statName] || 'bg-gray-500';
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <TrendingUp className="w-5 h-5" />
+            <span>{t('set_level_for')} {pokemon.name}</span>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Level Selector */}
+          <div className="space-y-4">
+            <Label className="text-base font-medium">{t('pokemon_level')}</Label>
+            
+            <div className="space-y-4">
+              <Slider
+                value={[tempLevel]}
+                onValueChange={(value) => setTempLevel(value[0])}
+                min={1}
+                max={100}
+                step={1}
+                className="w-full"
+              />
+              
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="level-input">{t('level')}:</Label>
+                  <Input
+                    id="level-input"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={tempLevel}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (value >= 1 && value <= 100) {
+                        setTempLevel(value);
+                      }
+                    }}
+                    className="w-20"
+                  />
+                </div>
+                
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTempLevel(50)}
+                  >
+                    {t('level')} 50
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTempLevel(100)}
+                  >
+                    {t('level')} 100
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Preview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <BarChart3 className="w-5 h-5" />
+                <span>{t('stats_at_level')} {tempLevel}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                {pokemon.stats.map((stat) => {
+                  const currentStat = calculateStatAtLevel(stat.base_stat, currentLevel);
+                  const newStat = calculateStatAtLevel(stat.base_stat, tempLevel);
+                  const difference = newStat - currentStat;
+
+                  return (
+                    <motion.div
+                      key={stat.stat.name}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-3 h-3 rounded-full ${getStatColor(stat.stat.name)}`} />
+                        <span className="font-medium">
+                          {getStatName(stat.stat.name)}
+                        </span>
+                      </div>
+                      
+                      <div className="text-right">
+                        <div className="font-bold text-lg">
+                          {newStat}
+                        </div>
+                        {difference !== 0 && (
+                          <div className={`text-sm ${difference > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {difference > 0 ? '+' : ''}{difference}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-2 pt-4 border-t">
+            <Button variant="outline" onClick={handleCancel}>
+              {t('cancel')}
+            </Button>
+            <Button onClick={handleSave}>
+              {t('save_level')}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

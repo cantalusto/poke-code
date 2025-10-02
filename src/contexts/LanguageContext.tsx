@@ -224,7 +224,22 @@ const translations = {
     // Orientation Guard
     'rotate_device': 'Please rotate your device',
     'landscape_required': 'This application works best in landscape mode',
-    'rotate_automatically': 'Rotate Automatically'
+    'rotate_automatically': 'Rotate Automatically',
+
+    // Move and Level Selection
+    'select_moves_for': 'Select moves for',
+    'selected': 'selected',
+    'loading_moves': 'Loading moves...',
+    'save_moves': 'Save Moves',
+    'set_level_for': 'Set level for',
+    'stats_at_level': 'Stats at level',
+    'save_level': 'Save Level',
+    'attack': 'Attack',
+    'defense': 'Defense',
+    'sp_attack': 'Sp. Attack',
+    'sp_defense': 'Sp. Defense',
+    'accuracy': 'Accuracy',
+    'click_move_details': 'Click move for details'
   },
   'pt-BR': {
     // Header
@@ -435,7 +450,22 @@ const translations = {
     // Orientation Guard
     'rotate_device': 'Por favor, gire seu dispositivo',
     'landscape_required': 'Esta aplicação funciona melhor no modo paisagem',
-    'rotate_automatically': 'Girar Automaticamente'
+    'rotate_automatically': 'Girar Automaticamente',
+
+    // Move and Level Selection
+    'select_moves_for': 'Selecionar movimentos para',
+    'selected': 'selecionado',
+    'loading_moves': 'Carregando movimentos...',
+    'save_moves': 'Salvar Movimentos',
+    'set_level_for': 'Definir nível para',
+    'stats_at_level': 'Estatísticas no nível',
+    'save_level': 'Salvar Nível',
+    'attack': 'Ataque',
+    'defense': 'Defesa',
+    'sp_attack': 'At. Especial',
+    'sp_defense': 'Def. Especial',
+    'accuracy': 'Precisão',
+    'click_move_details': 'Clique no movimento para detalhes'
   }
 };
 
